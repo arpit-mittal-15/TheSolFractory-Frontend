@@ -16,7 +16,11 @@ export default function SolFactoryAdvantage() {
       <div className="w-full max-w-7xl flex justify-center mb-14">
         <div className="w-full rounded-2xl bg-[#f6cdd5] aspect-25/5 flex items-center justify-center">
           <span className="text-white text-4xl md:text-6xl font-bold text-center leading-tight">
-            YOUR <br /> VIDEO <br /> HERE
+                <video
+      controls
+      className="w-full max-w-3xl rounded-xl"
+      src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/SOL%20Video%28Compressed%29.mp4"
+    />
           </span>
         </div>
       </div>
