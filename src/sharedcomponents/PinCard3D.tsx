@@ -13,15 +13,15 @@ interface AnimatedPinCardProps {
 export function AnimatedPinCard({ title, description, image }: AnimatedPinCardProps) {
   return (
     <PinContainer title={title} href="#">
-      <div className="flex basis-full flex-col p-4 tracking-tight text-slate-100/80 w-[20rem] h-[22rem]">
+      <div className="flex basis-full flex-col tracking-tight text-slate-100/80 w-[20rem] h-[22rem]">
         
         {/* Title */}
-        <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+        {/* <h3 className="text-lg font-semibold text-white mb-2">{title}</h3> */}
 
         {/* Description */}
-        <p className="text-sm text-white/70 leading-relaxed mb-4">
+        {/* <p className="text-sm text-white/70 leading-relaxed mb-4">
           {description}
-        </p>
+        </p> */}
 
         {/* Image */}
         <div className="flex-1 w-full rounded-lg overflow-hidden shadow-lg">

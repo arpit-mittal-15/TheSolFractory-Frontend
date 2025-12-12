@@ -5,122 +5,89 @@ import { GlowingEffect } from "@/components/ui/glowing-effect";
 
 export default function SolFactoryAdvantage() {
   return (
-    <section className="w-full flex justify-center py-5 px-6">
-      <div className="max-w-7xl w-full border-[1px] border-white/60 
-      rounded-xl p-8 md:p-12 
-      flex flex-col md:flex-row gap-12 
-      shadow-[0_0_40px_20px_rgba(0,0,0,0.5)]
-">
-        
-        {/* LEFT SIDE CONTENT */}
-        <div className="flex-1">
-          <h2 className="text-white text-3xl md:text-4xl font-bold mb-10">
-            The SOL Factory Advantage
-          </h2>
+    <section className="w-full bg-[#0e1a2b] py-14 px-6 flex flex-col items-center">
 
-          <div className="flex flex-col gap-8">
+      {/* TITLE */}
+      <h2 className="text-white text-3xl md:text-4xl font-bold text-center mb-10">
+        The SOL Factory Advantage
+      </h2>
 
-            {/* CARD 1 */}
-            <CardGlowWrapper>
-              <h3 className="font-semibold text-lg mb-2 text-[#FFFF]">Premium Quality</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
-                Machine-made cones crafted with food-grade materials and strict QC 
-                for smooth packing and even burns.
-              </p>
-            </CardGlowWrapper>
-            {/* CARD 2 */}
-            <CardGlowWrapper>
-              <h3 className="font-semibold text-lg mb-2 text-[#FFFF]">Built for Scale</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
-                Fully compatible with top filling machines—perfect for 
-                high-volume production.
-              </p>
-            </CardGlowWrapper>
-
-            {/* CARD 3 */}
-            <CardGlowWrapper>
-              <h3 className="font-semibold text-lg mb-2 text-[#FFFF]">White-Label Experts</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
-                Custom sizes, branded filters, and packaging tailored 
-                to your product line.
-              </p>
-            </CardGlowWrapper>
-
-            {/* CARD 4 */}
-            <CardGlowWrapper>
-              <h3 className="font-semibold text-lg mb-2 text-[#FFFF]">Full Support</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
-                From design to delivery, we handle every step for a seamless 
-                manufacturing experience.
-              </p>
-            </CardGlowWrapper>
-
-          </div>
+      {/* VIDEO FULL WIDTH */}
+      <div className="w-full max-w-7xl flex justify-center mb-14">
+        <div className="w-full rounded-2xl bg-[#f6cdd5] aspect-25/5 flex items-center justify-center">
+          <span className="text-white text-4xl md:text-6xl font-bold text-center leading-tight">
+            YOUR <br /> VIDEO <br /> HERE
+          </span>
         </div>
+      </div>
 
-        {/* RIGHT SIDE VIDEO PLACEHOLDER */}
-        <div className="flex-1 flex justify-center">
-          <div className="rounded-2xl bg-[#f6cdd5] w-full aspect-[3/4] max-w-md flex items-center justify-center">
-            <span className="text-white text-3xl md:text-4xl font-bold text-center">
-              YOUR<br />VIDEO<br />HERE
-            </span>
-          </div>
-        </div>
+      {/* 4 CARDS GRID */}
+      <div className="
+        max-w-7xl 
+        w-full 
+        grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 
+        gap-8
+      ">
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white">Premium Quality</h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Machine-made cones crafted with food-grade materials and strict QC 
+            for smooth packing and even burns.
+          </p>
+        </CardGlowWrapper>
 
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white">White-Label Experts</h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Custom sizes, branded filters, and packaging tailored 
+            to your product line.
+          </p>
+        </CardGlowWrapper>
+
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white">Built for Scale</h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Fully compatible with top filling machines—perfect for 
+            high-volume production.
+          </p>
+        </CardGlowWrapper>
+
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white">Full Support</h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            From design to delivery, we handle every step for a seamless 
+            manufacturing experience.
+          </p>
+        </CardGlowWrapper>
       </div>
     </section>
   );
 }
 
 
-// ⭐ Reusable Glow Card Wrapper
-// ⭐ Reusable 3D Glow Card Wrapper
+/* ⭐ Reusable Glow Wrapper */
 const CardGlowWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className="
-        relative rounded-xl p-6 bg-white/5 max-w-md border border-white/10
-        shadow-[0px_8px_20px_rgba(0,0,0,0.4)] 
+        relative rounded-xl p-6 bg-white/5 border border-white/10
+        shadow-[0_0_20px_rgba(0,0,0,0.4)]
         transition-all duration-300 
-        hover:shadow-[0px_20px_40px_rgba(0,0,0,0.6)] 
+        hover:shadow-[0_0_40px_rgba(0,0,0,0.6)]
         hover:-translate-y-2 
         hover:scale-[1.03]
-        hover:border-white/20
-        [perspective:1000px]
       "
-      style={{
-        transformStyle: "preserve-3d",
-      }}
     >
-      {/* Glow */}
       <GlowingEffect
         spread={60}
         glow={true}
-        disabled={false}
         proximity={80}
+        disabled={false}
         inactiveZone={0.01}
       />
 
-      {/* Content Layer */}
-      <div
-        className="relative"
-        style={{
-          transform: "translateZ(35px)", // makes content pop forward
-        }}
-      >
-        {children}
-      </div>
-
-      {/* Back Card Depth Layer */}
-      <div
-        className="absolute inset-0 rounded-xl bg-white/5"
-        style={{
-          transform: "translateZ(-20px)", // fake depth behind the card
-          filter: "blur(8px)",
-          opacity: 0.15,
-        }}
-      ></div>
+      {/* content */}
+      <div className="relative z-10">{children}</div>
     </div>
   );
 };
-

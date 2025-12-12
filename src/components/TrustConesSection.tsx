@@ -31,7 +31,7 @@ const features = [
 
 export default function TrustConesSection() {
   return (
-    <section className="w-full bg-[#0b1c33] py-10 flex justify-center px-6">
+    <section className="w-full py-10 flex justify-center px-6">
       <div className="max-w-6xl w-full flex flex-col items-center">
 
         {/* Heading Box */}
