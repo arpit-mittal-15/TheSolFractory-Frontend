@@ -1,5 +1,15 @@
 import { Check } from "lucide-react";
 import { LensImage } from "../sharedcomponents/Lens";
+import { CompareEffect } from "./CompareEffect";
+import Image from "next/image";
+import { Marquee3D } from "./ThreeDMarquee";
+
+type ImageEffect =
+  | { type: "none" }
+  | { type: "lens" }
+  | { type: "marquee"}
+  | { type: "compare"; secondImage: string };
+
 
 interface InfoCardProps {
   bgColor?: string;
@@ -10,6 +20,7 @@ interface InfoCardProps {
   footer?: string;
   image: string;
   imageOnRight?: boolean; // true = image right, false = image left
+  imageEffect?: ImageEffect;
 }
 
 export default function InfoCard({
@@ -21,6 +32,7 @@ export default function InfoCard({
   footer,
   image,
   imageOnRight = true,
+  imageEffect,
 }: InfoCardProps) {
   return (
     <section
@@ -68,25 +80,27 @@ export default function InfoCard({
 
             {/* IMAGE */}
             <div>
-              <LensImage
+              <AnimatedImage
                 src={image}
                 alt={`${title} image`}
-                height={800}
                 width={1400}
+                height={800}
                 className="rounded-2xl object-cover w-full"
+                effect={imageEffect}
               />
             </div>
           </>
-        ) : (
+        )  : (
           <>
             {/* IMAGE (left) */}
             <div>
-              <LensImage
+              <AnimatedImage
                 src={image}
                 alt={`${title} image`}
-                height={800}
                 width={1400}
+                height={800}
                 className="rounded-2xl object-cover w-full"
+                effect={imageEffect}
               />
             </div>
 
@@ -128,3 +142,60 @@ export default function InfoCard({
     </section>
   );
 }
+
+function AnimatedImage({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  effect = { type: "none" },
+}: {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  className?: string;
+  effect?: ImageEffect;
+}) {
+  switch (effect.type) {
+    case "compare":
+      return (
+        <CompareEffect
+          firstImage={src}
+          secondImage={effect.secondImage}
+          width={width}
+          height={height}
+        />
+      );
+
+    case "marquee":
+      return (
+        <Marquee3D width={width} height={height} />
+      );
+
+    case "lens":
+      return (
+        <LensImage
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className={className}
+        />
+      );
+
+    default:
+      return (
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className={className}
+        />
+      );
+  }
+}
+
+

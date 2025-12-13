@@ -21,10 +21,13 @@ export default function MergedCards() {
         footer="Each one is engineered for filling machine compatibility and consistent performance."
         image="/homepage/sizechart.png"
         imageOnRight={false}
+        imageEffect={{
+          type: "marquee"
+        }}
       />
 
       {/* 2 — Paper Options */}
-      <InfoCard
+      {isMobile? null : <InfoCard
         bgColor="#040E1C"
         title="Paper Options That Match Your Brand Identity"
         subtitle="Choose the paper that aligns with your product vision and target market:"
@@ -35,12 +38,16 @@ export default function MergedCards() {
           "Organic hemp for brands focused on purity and plant-based experience",
         ]}
         footer="All papers meet food-grade standards and are tested for burn consistency, airflow, and thickness."
-        image="/homepage/sizechart.png"
+        image="/bluetshirt.png"
         imageOnRight={true}
-      />
+        imageEffect={{
+          type: "compare",
+          secondImage: "/whitetshirt.png",
+        }}
+      />}
 
       {/* 3 — Your second version of Size Chart */}
-      {isMobile? null : <InfoCard
+      <InfoCard
         bgColor="#0F1620"
         title="Custom Cone Dimensions:"
         description="We help brands create signature sizes for special product lines, collaborations, or market trends."
@@ -48,7 +55,10 @@ export default function MergedCards() {
         footer="Engineered with consistency and machine-fill compatibility in mind."
         image="/homepage/sizechart.png"
         imageOnRight={false}
-      />}
+        imageEffect={{
+          type: "lens"
+        }}
+      />
 
       {/* 4 — Another paper style section */}
     {isMobile? null : <InfoCard

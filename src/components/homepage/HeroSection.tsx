@@ -4,6 +4,7 @@ import Link from 'next/link';
 import MobileHeroSection from './MobileHeroSection';
 import { useIsMobile } from "@/hooks/use-mobile";
 import FullPageLoader from "@/src/components/FullPageLoader";
+import { PointerHighlight } from "@/components/ui/pointer-highlight";
 
 const HeroSection: React.FC = () => {
 
@@ -15,11 +16,19 @@ const HeroSection: React.FC = () => {
 
   return (
     <section className="hero-section text-white py-20 px-6 text-center mt-28">
-      <h1 className="text-4xl md:text-5xl font-bold mb-4">
-        {/* Hardcoded title with line break */}
-        <span className="block">We Don’t Just <span className='text-[#98BFF5]'>Make Cones</span></span>
-        <span className="block">We Make Your <span className='text-[#98BFF5]'>Brand Possible</span></span>
-      </h1>
+<h1 className="text-4xl md:text-5xl font-bold mb-4">
+  <span>
+    We Don’t Just{' '}
+    <PointerHighlight containerClassName="inline-block">
+      <span className="text-[#98BFF5]">Make Cones</span>
+    </PointerHighlight>
+  </span>
+  <br />
+  <span>
+    We Make Your <span className="text-[#98BFF5]">Brand Possible</span>
+  </span>
+</h1>
+
       <p className="text-lg md:text-xl text-gray-300 mb-8">
         Exceptional quality. Endless customization. True scalability.
       </p>
