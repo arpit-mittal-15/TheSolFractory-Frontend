@@ -7,6 +7,7 @@ import Link from "next/link";
 import { BorderGradient } from "@/src/sharedcomponents/BorderGradient";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { CartButton } from "@/components/CartButton";
+import Image from "next/image";
 
 const menus = [
   { name: "HOME", path: "/" },
@@ -35,9 +36,15 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full py-4 px-8 flex items-center justify-between bg-[#132135]">
-      <Link href="/" className="text-white font-semibold tracking-wide text-lg">
-        SOL FACTORY
-      </Link>
+    <Link href="/" className="flex items-center">
+      <Image
+        src="/logo.png"
+        alt="Company Logo"  
+        width={85}
+        height={30}
+        className="object-contain"
+      />
+    </Link>
 
       {isMobile ? (
         // MOBILE

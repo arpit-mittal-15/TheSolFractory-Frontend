@@ -2,10 +2,17 @@
 
 import React from "react";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
+import MobileSolFactoryAdvantage from "./MobileSolFactoryAdvantage";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function SolFactoryAdvantage() {
+
+    const isMobile = useIsMobile();
+  
+    if(isMobile) return <MobileSolFactoryAdvantage />
+
   return (
-    <section className="w-full bg-[#0e1a2b] py-14 px-6 flex flex-col items-center">
+    <section className="w-full py-14 px-6 flex flex-col items-center">
 
       {/* TITLE */}
       <h2 className="text-white text-3xl md:text-4xl font-bold text-center mb-10">
@@ -13,15 +20,15 @@ export default function SolFactoryAdvantage() {
       </h2>
 
       {/* VIDEO FULL WIDTH */}
-<div className="w-full max-w-7xl flex justify-center mb-14">
-  <div className="w-full rounded-2xl bg-[#f6cdd5] aspect-20/5 flex items-center justify-center">
-    <video
-      controls
-      className="w-full h-full rounded-2xl object-cover"
-      src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/SOL%20Video%28Compressed%29.mp4"
-    />
-  </div>
-</div>
+      <div className="w-full max-w-7xl flex justify-center mb-14">
+        <div className="w-full rounded-2xl bg-[#f6cdd5] aspect-22/5 flex items-center justify-center">
+          <video
+            controls
+            className="w-full h-full rounded-2xl object-cover"
+            src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/SOL%20Video%28Compressed%29.mp4"
+          />
+        </div>
+      </div>
 
 
       {/* 4 CARDS GRID */}

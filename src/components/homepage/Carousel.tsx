@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
+import MobileCarousel from "./MobileCarousel";
 
 interface CardItem {
   image: string;
@@ -17,20 +19,27 @@ const cards: CardItem[] = [
   { image: "/homepage/conestack.png", label: "Hemp Cones" },
 ];
 
-export default function Carousel() {
-  const [active, setActive] = useState(2);
-  const total = cards.length;
+const total = cards.length;
 
-  // Circular index
-  const wrap = (index: number) => (index + total) % total;
+// Circular index
+const wrap = (index: number) => (index + total) % total;
+
+export default function Carousel() {
+  const isMobile = useIsMobile();
+  const [active, setActive] = useState(2);
 
   // 🔥 Auto Slide Every 3 Seconds
   useEffect(() => {
+    if (isMobile) return; // Don't run auto-slide on mobile
     const interval = setInterval(() => {
       setActive((prev) => wrap(prev + 1));
     }, 1000000);
     return () => clearInterval(interval);
-  },);
+  }, [isMobile]);
+
+  if (isMobile) {
+    return <MobileCarousel />;
+  }
 
   return (
     <section className="w-full flex flex-col items-center py-10">

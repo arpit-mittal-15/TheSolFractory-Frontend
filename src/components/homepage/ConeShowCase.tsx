@@ -1,6 +1,11 @@
+'use client'
 import InfoCard from "@/src/sharedcomponents/InfoCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function MergedCards() {
+
+  const isMobile = useIsMobile();
+
   return (
     <div>
 
@@ -32,7 +37,7 @@ export default function MergedCards() {
       />
 
       {/* 3 — Your second version of Size Chart */}
-      <InfoCard
+      {isMobile? null : <InfoCard
         bgColor="#0F1620"
         title="Custom Cone Dimensions:"
         description="We help brands create signature sizes for special product lines, collaborations, or market trends."
@@ -40,23 +45,23 @@ export default function MergedCards() {
         footer="Engineered with consistency and machine-fill compatibility in mind."
         image="/homepage/sizechart.png"
         imageOnRight={false}
-      />
+      />}
 
       {/* 4 — Another paper style section */}
-      <InfoCard
-        bgColor="#040E1C"
-        title="Premium Rolling Papers"
-        subtitle="Select from our range of premium rolling paper materials:"
-        description=""
-        bullets={[
-          "Ultra-thin refined white paper",
-          "Slow-burning natural paper",
-          "Eco-certified sustainable blends",
-        ]}
-        footer="Every paper is precision tested for airflow, burn rate, and structural consistency."
-        image="/homepage/sizechart.png"
-        imageOnRight={true}
-      />
+    {isMobile? null : <InfoCard
+            bgColor="#040E1C"
+            title="Premium Rolling Papers"
+            subtitle="Select from our range of premium rolling paper materials:"
+            description=""
+            bullets={[
+              "Ultra-thin refined white paper",
+              "Slow-burning natural paper",
+              "Eco-certified sustainable blends",
+            ]}
+            footer="Every paper is precision tested for airflow, burn rate, and structural consistency."
+            image="/homepage/sizechart.png"
+            imageOnRight={true}
+          />}
 
     </div>
   );

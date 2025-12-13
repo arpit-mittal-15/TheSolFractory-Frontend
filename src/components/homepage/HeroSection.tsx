@@ -1,8 +1,15 @@
-// components/HeroSection.tsx
+'use client'
 import React from 'react';
 import Link from 'next/link';
+import MobileHeroSection from './MobileHeroSection';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const HeroSection: React.FC = () => {
+
+  const isMobile = useIsMobile();
+
+  if(isMobile) return <MobileHeroSection />
+
   return (
     <section className="hero-section text-white py-20 px-6 text-center mt-28">
       <h1 className="text-4xl md:text-5xl font-bold mb-4">

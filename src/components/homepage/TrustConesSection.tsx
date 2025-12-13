@@ -2,6 +2,8 @@
 
 import React from "react";
 import { AnimatedPinCard } from "@/src/sharedcomponents/PinCard3D";
+import MobileTrustCones from "./MobileTrustCones";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const features = [
   {
@@ -30,6 +32,11 @@ const features = [
 ];
 
 export default function TrustConesSection() {
+
+  const isMobile = useIsMobile();
+
+  if(isMobile) return <MobileTrustCones />
+
   return (
     <section className="w-full py-10 flex justify-center px-6">
       <div className="max-w-6xl w-full flex flex-col items-center">
