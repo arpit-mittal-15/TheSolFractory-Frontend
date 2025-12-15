@@ -2,12 +2,9 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
 
 export default function CatalogPageSkeleton() {
   const isMobile = useIsMobile();
-
-  if (isMobile === null) return <FullPageLoader />;
 
   return (
     <div className="min-h-screen bg-[#132135] pt-24 pb-12 px-4 md:px-8">

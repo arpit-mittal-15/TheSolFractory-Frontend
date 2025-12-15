@@ -1,270 +1,134 @@
 "use client";
 
 import React, { useState } from "react";
-import Footer from "@/src/components/Footer";
 import Navbar from "@/src/components/Navbar";
-import { Button } from "@/components/ui/button";
+import Footer from "@/src/components/Footer";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { GlowingEffect } from "@/components/ui/glowing-effect";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
+import { Button } from "@/components/ui/button";
+import { Mail, MapPin } from "lucide-react";
 
 export default function ContactPage() {
-  const isMobile = useIsMobile();
-  const [formData, setFormData] = useState({
-    name: "",
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
-    subject: "",
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-    // Reset form
-    setFormData({ name: "", email: "", subject: "", message: "" });
-  };
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  ) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setForm({ firstName: "", lastName: "", email: "", message: "" });
   };
 
-  if (isMobile === null) return <FullPageLoader />;
-
-  const contactInfo = [
-    {
-      icon: Mail,
-      title: "Email",
-      content: "hello@solfrance.com",
-      link: "mailto:hello@solfrance.com",
-    },
-    {
-      icon: Phone,
-      title: "Phone",
-      content: "+1 (897) 654-3210",
-      link: "tel:+18976543210",
-    },
-    {
-      icon: MapPin,
-      title: "Address",
-      content: "123 Factory Street, Industrial District",
-      link: "#",
-    },
-    {
-      icon: Clock,
-      title: "Business Hours",
-      content: "Mon - Fri: 8 AM to 8 PM",
-      link: "#",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#132135]">
+    <div className="min-h-screen bg-white">
       <Navbar />
-      <main className="pt-24 pb-12 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-12 md:mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Get in <span className="text-blue-400">Touch</span>
-            </h1>
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
-              Have a question or want to discuss your custom order? We're here
-              to help. Reach out and we will get back to you as soon as possible.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-            {/* Contact Info Cards - Left Side */}
-            <div className="lg:col-span-1 space-y-6">
-              {contactInfo.map((info, index) => {
-                const Icon = info.icon;
-                return (
-                  <a
-                    key={index}
-                    href={info.link}
-                    className="block group"
-                  >
-                    <Card className="relative bg-gray-800/50 border border-gray-700 p-6 hover:border-blue-400/50 transition-all duration-300 overflow-hidden">
-                      <GlowingEffect
-                        glow={true}
-                        disabled={false}
-                        proximity={80}
-                        spread={60}
-                      />
-                      <div className="relative z-10">
-                        <div className="flex items-start gap-4">
-                          <div className="p-3 bg-blue-600/20 rounded-lg border border-blue-400/30 group-hover:bg-blue-600/30 transition-colors">
-                            <Icon className="h-6 w-6 text-blue-400" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold mb-1">
-                              {info.title}
-                            </h3>
-                            <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors">
-                              {info.content}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </a>
-                );
-              })}
-            </div>
+      <main className="pt-28 px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+          {/* Left Content */}
+{/* Left Content */}
+<div className="space-y-6">
+  <h1 className="text-5xl font-semibold text-gray-900">Contact Us</h1>
 
-            {/* Contact Form - Right Side */}
-            <div className="lg:col-span-2">
-              <Card className="relative bg-gray-800/50 border border-gray-700 p-6 md:p-10 overflow-hidden">
-                <GlowingEffect
-                  glow={true}
-                  disabled={false}
-                  proximity={100}
-                  spread={80}
-                />
-                <div className="relative z-10">
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-                    Send us a Message
-                  </h2>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Name and Email Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-gray-300">
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          type="text"
-                          placeholder="John Doe"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
-                          className="bg-black/60 border-gray-600 text-white placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/50"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-gray-300">
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          placeholder="john.doe@example.com"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
-                          className="bg-black/60 border-gray-600 text-white placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/50"
-                        />
-                      </div>
-                    </div>
+  <p className="text-gray-500 max-w-md leading-relaxed">
+    A better future is possible. Contact us to learn more about our mission and work, or to become involved yourself.
+  </p>
 
-                    {/* Subject */}
-                    <div className="space-y-2">
-                      <Label htmlFor="subject" className="text-gray-300">
-                        Subject
-                      </Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        type="text"
-                        placeholder="What's this about?"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                        className="bg-black/60 border-gray-600 text-white placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/50"
-                      />
-                    </div>
+  {/* Email */}
+  <a
+    href="mailto:braj@thesolfactory.com"
+    className="text-blue-600 font-medium block"
+  >
+    braj@thesolfactory.com
+  </a>
 
-                    {/* Message */}
-                    <div className="space-y-2">
-                      <Label htmlFor="message" className="text-gray-300">
-                        Message
-                      </Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        placeholder="Tell us more about your inquiry..."
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                        rows={6}
-                        className="bg-black/60 border-gray-600 text-white placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/50 resize-none"
-                      />
-                    </div>
+  {/* Company & Address */}
+  <div className="text-gray-500 space-y-4">
+    <p className="font-medium text-gray-700">Solitude Flame Private Limited</p>
+    <p className="flex items-start gap-2 w-200">
+      <MapPin className="h-4 w-4 mt-1" />
+      D63B, Site 4, Behind Fortis Hospital,
+      <br />
+      Greater Noida 201310
+    </p>
+  </div>
 
-                    {/* Submit Button */}
-                    <div className="pt-4">
-                      <HoverBorderGradient
-                        as="button"
-                        type="submit"
-                        containerClassName="w-full md:w-auto"
-                        className="w-full md:w-auto bg-[#132135] text-white px-8 py-3 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#132135]/90 transition-colors"
-                      >
-                        <Send className="h-5 w-5" />
-                        Send Message
-                      </HoverBorderGradient>
-                    </div>
-                  </form>
+  {/* Social icons */}
+  <div className="flex gap-4 pt-4">
+    <div className="h-9 w-9 rounded-full border flex items-center justify-center">
+      <span className="text-sm font-medium">in</span>
+    </div>
+    <div className="h-9 w-9 rounded-full border flex items-center justify-center">
+      <span className="text-sm font-medium">X</span>
+    </div>
+    <div className="h-9 w-9 rounded-full border flex items-center justify-center">
+      <span className="text-sm font-medium">IG</span>
+    </div>
+  </div>
+</div>
+
+
+          {/* Right Form */}
+          <div className="bg-white shadow-xl rounded-2xl p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm text-gray-500">First Name*</label>
+                  <Input
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleChange}
+                    className="mt-2"
+                  />
                 </div>
-              </Card>
-            </div>
-          </div>
 
-          {/* Additional Info Section */}
-          <div className="mt-12 md:mt-16">
-            <Card className="relative bg-gray-800/30 border border-gray-700/50 p-6 md:p-8 overflow-hidden">
-              <GlowingEffect
-                glow={true}
-                disabled={false}
-                proximity={120}
-                spread={100}
-              />
-              <div className="relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-center">
-                  <div>
-                    <h3 className="text-white font-semibold text-lg mb-2">
-                      Quick Response
-                    </h3>
-                    <p className="text-gray-400 text-sm">
-                      We typically respond within 24 hours
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-lg mb-2">
-                      Expert Support
-                    </h3>
-                    <p className="text-gray-400 text-sm">
-                      Our team is here to help with any questions
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-lg mb-2">
-                      Custom Solutions
-                    </h3>
-                    <p className="text-gray-400 text-sm">
-                      Discuss your unique requirements with us
-                    </p>
-                  </div>
+                <div>
+                  <label className="text-sm text-gray-500">Last Name*</label>
+                  <Input
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleChange}
+                    className="mt-2"
+                  />
                 </div>
               </div>
-            </Card>
+
+              <div>
+                <label className="text-sm text-gray-500">Email*</label>
+                <Input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-500">Message*</label>
+                <Textarea
+                  name="message"
+                  rows={5}
+                  value={form.message}
+                  onChange={handleChange}
+                  className="mt-2 resize-none"
+                />
+              </div>
+
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 rounded-xl h-12">
+                Send →
+              </Button>
+            </form>
           </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

@@ -1,18 +1,6 @@
-import HomePageSkeleton from "@/src/components/skeletons/HomePageSkeleton";
-import Footer from "@/src/components/Footer";
-import Navbar from "@/src/components/Navbar";
+import FullPageLoader from "@/src/components/FullPageLoader";
 
 export default function Loading() {
-  return (
-    <div className="">
-      <Navbar />
-      <main>
-        <HomePageSkeleton />
-      </main>
-      <footer>
-        <Footer />
-      </footer>
-    </div>
-  );
+  return <FullPageLoader />;
 }
 

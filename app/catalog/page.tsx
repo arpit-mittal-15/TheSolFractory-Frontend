@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { useCart } from "@/src/contexts/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
+import CatalogPageSkeleton from "@/src/components/skeletons/CatalogPageSkeleton";
 
 // Mock product data
 const products = [
@@ -155,7 +155,7 @@ export default function CatalogPage() {
     return true;
   });
 
-  if (isMobile === null) return <FullPageLoader />;
+  if (isMobile === null) return <CatalogPageSkeleton />;
 
   return (
     <div className="min-h-screen bg-[#132135]">

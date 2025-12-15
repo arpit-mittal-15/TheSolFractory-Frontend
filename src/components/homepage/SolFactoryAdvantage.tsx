@@ -24,7 +24,7 @@ export default function SolFactoryAdvantage() {
 
       {/* VIDEO FULL WIDTH */}
       <div className="w-full max-w-7xl flex justify-center mb-14">
-        <div className="w-full rounded-2xl bg-[#f6cdd5] aspect-22/5 flex items-center justify-center">
+        <div className="w-full rounded-2xl aspect-22/5 flex items-center justify-center">
           <video
             controls
             className="w-full h-full rounded-2xl object-cover"

@@ -2,12 +2,9 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
 
 export default function LoginPageSkeleton() {
   const isMobile = useIsMobile();
-
-  if (isMobile === null) return <FullPageLoader />;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-1 mt-20 mb-10.5">

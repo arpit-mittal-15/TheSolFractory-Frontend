@@ -74,6 +74,8 @@ export function ShoppingCartDialog({
                         src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover rounded-lg"
+                        width={64}
+                        height={64}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-500 rounded-lg flex items-center justify-center text-xs text-gray-400">
