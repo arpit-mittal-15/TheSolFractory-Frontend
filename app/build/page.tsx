@@ -7,7 +7,7 @@ import Footer from "@/src/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Check, Leaf, Droplets, Sparkles, Infinity, ChevronsDown, CircleDot, FileText, Sparkle, AlertCircle, X } from "lucide-react";
+import { ArrowLeft, Check, Leaf, Droplets, Sparkles, Infinity, ChevronsDown, CircleDot, FileText, Sparkle, AlertCircle, X, ArrowRight } from "lucide-react";
 import { useCart } from "@/src/contexts/CartContext";
 
 type PaperType = "unbleached" | "hemp" | "bleached" | "colored";
@@ -275,11 +275,11 @@ export default function BuildPage() {
       <main className="pt-24 pb-12 px-8">
         <div className="max-w-7xl mx-auto">
           {/* Step Indicator */}
-          <div className="flex justify-center mb-8">
+          {/* <div className="flex justify-center mb-8">
             <div className="px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-white text-sm font-medium">
               STEP {step} OF 5
             </div>
-          </div>
+          </div> */}
 
           {/* Step 1: Paper Type Selection */}
           {step === 1 && (
@@ -327,15 +327,15 @@ export default function BuildPage() {
                       <button
                         key={paper.id}
                         onClick={() => updateState({ paperType: paper.id })}
-                        className={`relative bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border-2 transition-all ${
+                        className={`relative btn-liquid-rect rounded-xl p-6 border-2 transition-all ${
                           isSelected
-                            ? "border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                            ? "active border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                             : "border-gray-700 hover:border-gray-600"
                         }`}
                       >
                         {isSelected && (
-                          <div className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Check className="h-4 w-4 text-white" />
+                          <div className="absolute top-3 right-3 w-7 h-7 tick-3d flex items-center justify-center">
+                            <Check className="h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
                           </div>
                         )}
                         <div className="flex flex-col items-center space-y-4">
@@ -358,16 +358,17 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={() => window.history.back()}
-                  className="bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700"
+                  className="nav-btn btn-liquid px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK TO CATALOG
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                  className="nav-btn btn-liquid active px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
-                  NEXT: SELECT FILTER TYPE
+                  Next
+                  <ArrowRight className="mr-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -419,15 +420,15 @@ export default function BuildPage() {
                       <button
                         key={filter.id}
                         onClick={() => updateState({ filterType: filter.id })}
-                        className={`relative w-full bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border-2 text-left transition-all ${
+                        className={`relative w-full btn-liquid-rect rounded-xl p-6 border-2 text-left transition-all ${
                           isSelected
-                            ? "border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                            ? "active border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                             : "border-gray-700 hover:border-gray-600"
                         }`}
                       >
                         {isSelected && (
-                          <div className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Check className="h-4 w-4 text-white" />
+                          <div className="absolute top-3 right-3 w-7 h-7 tick-3d flex items-center justify-center">
+                            <Check className="h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
                           </div>
                         )}
                         <div className="flex items-center space-x-4">
@@ -450,16 +451,17 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  className="bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700"
+                  className="nav-btn btn-liquid px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                  className="nav-btn btn-liquid active px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
-                  NEXT: CHOOSE SIZE
+                  NEXT
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -497,15 +499,15 @@ export default function BuildPage() {
                       <button
                         key={size.id}
                         onClick={() => updateState({ coneSize: size.id })}
-                        className={`relative bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border-2 transition-all ${
+                        className={`relative btn-liquid-rect rounded-xl p-6 border-2 transition-all ${
                           isSelected
-                            ? "border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                            ? "active border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                             : "border-gray-700 hover:border-gray-600"
                         }`}
                       >
                         {isSelected && (
-                          <div className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Check className="h-4 w-4 text-white" />
+                          <div className="absolute top-3 right-3 w-7 h-7 tick-3d flex items-center justify-center">
+                            <Check className="h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
                           </div>
                         )}
                         <div className="flex flex-col items-center space-y-3">
@@ -524,16 +526,17 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  className="bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700"
+                  className="nav-btn btn-liquid px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                  className="nav-btn btn-liquid active px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
-                  NEXT: SELECT QUANTITY / LOT
+                  NEXT
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -569,15 +572,15 @@ export default function BuildPage() {
                       <button
                         key={lot.id}
                         onClick={() => updateState({ lotSize: lot.id })}
-                        className={`relative bg-gray-800/50 backdrop-blur-lg rounded-xl p-5 border-2 transition-all ${
+                        className={`relative btn-liquid-rect rounded-xl p-5 border-2 transition-all ${
                           isSelected
-                            ? "border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                            ? "active border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                             : "border-gray-700 hover:border-gray-600"
                         }`}
                       >
                         {isSelected && (
-                          <div className="absolute top-3 right-3 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Check className="h-3 w-3 text-white" />
+                          <div className="absolute top-3 right-3 w-7 h-7 tick-3d flex items-center justify-center">
+                            <Check className="h-3 w-3 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
                           </div>
                         )}
                         <div className="space-y-2">
@@ -591,7 +594,7 @@ export default function BuildPage() {
                   })}
 
                   {/* Custom Lot Size */}
-                  <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-5 border-2 border-gray-700">
+                  <div className="btn-liquid-rect rounded-xl p-5 border-2 border-gray-700">
                     <h3 className="text-white font-semibold text-lg mb-3">Custom Lot Size</h3>
                     <Input
                       placeholder="ENTER QUANTITY (E.G., 25000)"
@@ -607,7 +610,7 @@ export default function BuildPage() {
                   </div>
 
                   {/* Your Selection */}
-                  <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-5 border-2 border-gray-700">
+                  <div className="btn-liquid-rect rounded-xl p-5 border-2 border-gray-700">
                     <h3 className="text-white font-semibold text-lg mb-4">Your Selection</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-gray-300">
@@ -638,16 +641,17 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  className="bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700"
+                  className="nav-btn btn-liquid px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                  className="nav-btn btn-liquid active px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                 >
-                  NEXT: SELECT QUANTITY / LOT
+                  NEXT
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -663,7 +667,7 @@ export default function BuildPage() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Shipping Address */}
                 <div className="lg:col-span-2 space-y-6">
-                  <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border-2 border-gray-700">
+                  <div className="bor-shadow rounded-xl p-6 border-2 border-gray-700">
                     <h2 className="text-white font-semibold text-xl mb-2">Shipping Address</h2>
                     <p className="text-gray-400 text-sm mb-6">
                       Provide your location details for an accurate shipping estimate.
@@ -713,14 +717,14 @@ export default function BuildPage() {
                     <Button
                       variant="outline"
                       onClick={prevStep}
-                      className="bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700"
+                      className="nav-btn btn-liquid px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       BACK
                     </Button>
                     <Button
                       onClick={handleAddToCart}
-                      className="bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                      className="nav-btn btn-liquid active px-6 py-6 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white"
                     >
                       ADD TO CART
                     </Button>
@@ -729,7 +733,7 @@ export default function BuildPage() {
 
                 {/* Right Column: Your Selection Sidebar */}
                 <div className="lg:col-span-1">
-                  <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl border-2 border-gray-700 overflow-hidden sticky top-24">
+                  <div className="bor-shadow active bg-gray-800/50 backdrop-blur-lg rounded-xl border-2 border-gray-700 overflow-hidden sticky top-24">
                     {/* Sidebar Header */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-700">
                       <h2 className="text-white font-semibold text-lg">Your Selection</h2>
@@ -764,14 +768,14 @@ export default function BuildPage() {
                     {/* Action Buttons */}
                     <div className="p-4 space-y-3 border-t border-gray-700">
                       <Button
-                        className="w-full bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                        className="btn-liquid-rect active w-full bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                         onClick={handleAddToCart}
                       >
                         PLACE ORDER
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10"
+                        className="btn-liquid-rect w-full bg-transparent border-2 border-blue-400 text-white hover:bg-blue-400/10"
                         onClick={() => {
                           // Handle request quote
                         }}

@@ -25,11 +25,6 @@ export default function MobileCarousel() {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-//   const onSelect = useCallback(() => {
-//     if (!emblaApi) return;
-//     setSelectedIndex(emblaApi.selectedScrollSnap());
-//   }, [emblaApi]);
-
     useEffect(() => {
     if (!emblaApi) return;
 
@@ -63,7 +58,7 @@ export default function MobileCarousel() {
               >
                 <div
                   className={`
-                    relative aspect-[3/4] rounded-2xl overflow-hidden
+                    relative aspect-3/4 rounded-2xl overflow-hidden
                     bg-white/10 backdrop-blur-md
                     border border-white/10
                     shadow-lg

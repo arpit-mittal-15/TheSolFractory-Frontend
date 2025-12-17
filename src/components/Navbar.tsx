@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ShoppingCartDialog } from "@/components/ShoppingCartDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/src/contexts/CartContext";
 
 const navLinks = [
@@ -16,6 +17,7 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const ismobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { getItemCount } = useCart();
@@ -95,9 +97,9 @@ export default function Navbar() {
 
 
 
-            <button
+            {ismobile ? <button
               onClick={() => setMobileOpen((prev) => !prev)}
-              className="lg:hidden p-3 btn-liquid text-white focus:outline-none relative btn-liquid group ml-1
+              className="relative btn-liquid group ml-1
                         w-8 h-8 md:w-10 md:h-10
                         flex items-center justify-center
                         rounded-full"
@@ -105,7 +107,7 @@ export default function Navbar() {
               aria-label="Toggle menu"
             >
               <i className={`fas ${mobileOpen ? "fa-times" : "fa-bars"} text-lg`} />
-            </button>
+            </button>: null}
           </div>
         </div>
 
@@ -115,7 +117,7 @@ export default function Navbar() {
             mobileOpen ? "open" : ""
           }`}
         >
-          <h3 className="text-xs font-bold uppercase tracking-widest text-blue-400 mb-2">Menu</h3>
+          {/* <h3 className="text-xs font-bold uppercase tracking-widest text-blue-400 mb-2">Menu</h3> */}
           {navLinks.map((link) => (
             <Link
               key={link.id}
@@ -129,7 +131,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          <h3 className="text-xs font-bold uppercase tracking-widest text-blue-400 mt-6 mb-2">
+          {/* <h3 className="text-xs font-bold uppercase tracking-widest text-blue-400 mt-6 mb-2">
             Account
           </h3>
           <div className="flex gap-4">
@@ -151,16 +153,16 @@ export default function Navbar() {
             >
               Sign Up
             </Link>
-          </div>
+          </div> */}
 
-          <div className="mt-8 flex justify-center gap-6">
+          {/* <div className="mt-8 flex justify-center gap-6">
             <a href="#" className="social-btn">
               <i className="fab fa-instagram text-white" />
             </a>
             <a href="#" className="social-btn">
               <i className="fab fa-twitter text-white" />
             </a>
-          </div>
+          </div> */}
         </div>
       </header>
 

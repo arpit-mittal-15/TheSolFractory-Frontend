@@ -63,7 +63,7 @@ const MobileCard = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className="relative h-full rounded-xl p-5 bg-white/5 border border-white/10">
+    <div className="relative h-full rounded-xl p-5 bg-white/5 border border-white/10 bor-shadow">
       <GlowingEffect
         spread={40}
         glow={true}

@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/src/contexts/CartContext";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface ShoppingCartDialogProps {
   open: boolean;
@@ -36,6 +36,8 @@ export function ShoppingCartDialog({
       document.body.style.overflow = "unset";
     };
   }, [open]);
+
+  const router = useRouter();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -137,7 +139,7 @@ export function ShoppingCartDialog({
                     text-gray-300 hover:text-white border-gray-500 rounded-3xl hover:bg-gray-800 transition border-[2px]"
               onClick={() => {
                 // Handle place order
-                console.log("Place order");
+                router.push("/order");
               }}
             >
               PLACE ORDER

@@ -89,6 +89,7 @@ const CardGlowWrapper = ({ children }: { children: React.ReactNode }) => {
         hover:shadow-[0_0_40px_rgba(0,0,0,0.6)]
         hover:-translate-y-2 
         hover:scale-[1.03]
+        bor-shadow
       "
     >
       <GlowingEffect

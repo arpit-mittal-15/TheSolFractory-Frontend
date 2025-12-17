@@ -3,6 +3,7 @@ import { LensImage } from "../sharedcomponents/Lens";
 import { CompareEffect } from "./CompareEffect";
 import Image from "next/image";
 import { Marquee3D } from "./ThreeDMarquee";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ImageEffect =
   | { type: "none" }
@@ -34,13 +35,16 @@ export default function InfoCard({
   imageOnRight = true,
   imageEffect,
 }: InfoCardProps) {
+
+  const isMobile = useIsMobile();
+
   return (
     <section
       className="w-full text-white py-10 px-6"
       style={{ backgroundColor: bgColor }}
       aria-labelledby={`card-title-${title.replace(/\s+/g, "-").toLowerCase()}`}
     >
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${isMobile ? "bor-shadow p-8 rounded-3xl active" : ""}`}>
         {/* If imageOnRight === true, render text first then image.
             If false, render image first then text. */}
         {imageOnRight ? (

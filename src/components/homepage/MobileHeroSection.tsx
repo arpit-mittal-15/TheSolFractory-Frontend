@@ -70,7 +70,7 @@ const MobileHeroSection: React.FC = () => {
       {/* Buttons */}
       <div className="flex flex-col items-center gap-3">
         <Link
-          href="/custom-order"
+          href="/build"
           className="
             w-[75%]
             max-w-[260px]
@@ -81,17 +81,17 @@ const MobileHeroSection: React.FC = () => {
             border border-blue-400/70
             shadow-[0_0_10px_rgba(59,130,246,0.5)]
             transition hover:bg-blue-700
-            text-center
+            text-center btn-liquid active
           "
         >
           Start Custom Order
         </Link>
 
         <Link
-          href="/get-quote"
+          href="/contact"
           className="
             w-[75%]
-            max-w-[260px]
+            max-w-65
             py-2
             text-sm font-medium
             rounded-full
@@ -99,6 +99,7 @@ const MobileHeroSection: React.FC = () => {
             text-gray-200
             transition hover:bg-gray-800
             text-center
+            btn-liquid
           "
         >
           Get a Quote

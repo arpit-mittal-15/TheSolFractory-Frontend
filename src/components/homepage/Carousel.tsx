@@ -97,10 +97,9 @@ export default function Carousel() {
 function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
   return (
     <div
-      className={`relative w-[320px] h-105 rounded-xl overflow-hidden
+      className={`relative w-[320px] h-105 rounded-xl overflow-hidden bor-shadow
                  backdrop-blur-lg border-2 border-[#D9D9D9]/60
-                 ${isActive ? "scale-105 shadow-[0_0_55px_rgba(0,0,0,0.65)]" : ""}
-                 shadow-[0_0_40px_20px_rgba(0,0,0,0.5)]`}
+                 `}
       style={{ background: "rgba(255,255,255,0.06)" }}
     >
       {/* IMAGE */}
@@ -114,7 +113,6 @@ function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
       {/* FULL IMAGE INNER BORDER (ALWAYS VISIBLE) */}
       <div
         className="absolute inset-0 rounded-xl
-                   box-border border-18 border-[#000000]/85
                    pointer-events-none z-10"
       />
 
