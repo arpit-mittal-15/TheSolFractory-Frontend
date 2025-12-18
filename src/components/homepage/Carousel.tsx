@@ -33,7 +33,7 @@ export default function Carousel() {
     if (isMobile) return; // Don't run auto-slide on mobile
     const interval = setInterval(() => {
       setActive((prev) => wrap(prev + 1));
-    }, 2000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [isMobile]);
 
@@ -97,10 +97,23 @@ export default function Carousel() {
 function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
   return (
     <div
-      className={`relative w-[320px] h-105 rounded-xl overflow-hidden bor-shadow
-                 backdrop-blur-lg border-2 border-[#D9D9D9]/60
-                 `}
-      style={{ background: "rgba(255,255,255,0.06)" }}
+      className="relative w-[320px] h-105 rounded-xl overflow-hidden transition-all duration-300 ease-in-out"
+      style={{
+        background: "rgba(19, 33, 53, 0.5)",
+        backdropFilter: "blur(30px)",
+        WebkitBackdropFilter: "blur(30px)",
+        border: "8px solid rgba(255, 255, 255, 0.12)",
+        borderTop: "12px solid rgba(255, 255, 255, 0.35)",
+        borderLeft: "10px solid rgba(255, 255, 255, 0.2)",
+        borderBottom: "12px solid rgba(0, 0, 0, 0.4)",
+        borderRight: "10px solid rgba(0, 0, 0, 0.25)",
+        boxShadow: `
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          inset 0 4px 8px rgba(255, 255, 255, 0.5),
+          inset 0 -8px 25px rgba(0, 0, 0, 0.4),
+          0 0 0 2px rgba(255, 255, 255, 0.08)
+        `,
+      }}
     >
       {/* IMAGE */}
       <Image

@@ -1,13 +1,17 @@
 "use client";
 
 import { Instagram, Linkedin, Twitter } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
+
+  const isMobile = useIsMobile();
+
   return (
     <footer className="w-full bg-[#0D1624] text-white py-7 px-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-39">
+    <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 ${isMobile ? "gap-10" : "gap-65"}`}>
 
         {/* LEFT — Brand + Social */}
         <div>
@@ -52,9 +56,10 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold mb-4">Explore</h3>
           <ul className="space-y-3 text-white/70">
-            <li><a href="#" className="hover:text-white">Home</a></li>
-            <li><a href="#" className="hover:text-white">Catalog</a></li>
-            <li><a href="#" className="hover:text-white">Contact Us</a></li>
+            <li><a href="/home" className="hover:text-white">Home</a></li>
+            <li><a href="/catalog" className="hover:text-white">Products</a></li>
+            <li><a href="/build" className="hover:text-white">Build</a></li>
+            <li><a href="/contact" className="hover:text-white">Contact Us</a></li>
           </ul>
         </div>
 

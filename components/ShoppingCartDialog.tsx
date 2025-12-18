@@ -43,7 +43,7 @@ export function ShoppingCartDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#132135] border-l border-gray-700 text-white w-full max-w-md h-full p-0 sm:rounded-none fixed right-0 top-0 !left-auto !bottom-0 flex flex-col shadow-2xl cart-drawer !translate-x-0 !translate-y-0 data-[state=closed]:!slide-out-to-left-0 data-[state=closed]:!slide-out-to-top-0 data-[state=open]:!slide-in-from-left-0 data-[state=open]:!slide-in-from-top-0 data-[state=closed]:!zoom-out-100 data-[state=open]:!zoom-in-100">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-700">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" style={{ textShadow: "0 0 8px rgba(255,255,255,0.6)" }}>
             <DialogTitle className="text-xl font-semibold text-white">
               Your Selection
             </DialogTitle>

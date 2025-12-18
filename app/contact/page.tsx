@@ -31,7 +31,7 @@ export default function ContactPage() {
       <main className="min-h-screen pt-24 md:pt-32 pb-20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-12 md:gap-16">
           <div className="space-y-8 order-2 lg:order-1">
-            <h2 className="text-3xl md:text-4xl font-serif">Headquarters</h2>
+            <h2 className="text-3xl md:text-4xl font-serif" style={{ textShadow: "0 0 8px rgba(255,255,255,0.6)" }}>Headquarters</h2>
             <div className="glass-panel p-8 space-y-6">
               <div>
                 <h4 className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-2">
@@ -74,9 +74,6 @@ export default function ContactPage() {
                 <a href="#" className="social-btn">
                   <i className="fab fa-twitter text-white" />
                 </a>
-                <a href="#" className="social-btn">
-                  <i className="fab fa-facebook-f text-white" />
-                </a>
               </div>
             </div>
           </div>
@@ -90,7 +87,7 @@ export default function ContactPage() {
                   placeholder="Full Name"
                   value={form.fullName}
                   onChange={handleChange}
-                  className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white"
+                  className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white"
                 />
                 <input
                   type="text"
@@ -98,7 +95,7 @@ export default function ContactPage() {
                   placeholder="Job Title"
                   value={form.jobTitle}
                   onChange={handleChange}
-                  className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white"
+                  className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -108,7 +105,7 @@ export default function ContactPage() {
                   placeholder="Work Email"
                   value={form.email}
                   onChange={handleChange}
-                  className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white"
+                  className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white"
                 />
                 <input
                   type="tel"
@@ -116,7 +113,7 @@ export default function ContactPage() {
                   placeholder="Phone Number"
                   value={form.phone}
                   onChange={handleChange}
-                  className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white"
+                  className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -126,7 +123,7 @@ export default function ContactPage() {
                   placeholder="Company Name"
                   value={form.company}
                   onChange={handleChange}
-                  className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white"
+                  className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white"
                 />
                 <input
                   type="text"
@@ -134,7 +131,7 @@ export default function ContactPage() {
                   placeholder="Website"
                   value={form.website}
                   onChange={handleChange}
-                  className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white"
+                  className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white"
                 />
               </div>
               <textarea
@@ -143,11 +140,17 @@ export default function ContactPage() {
                 rows={5}
                 value={form.message}
                 onChange={handleChange}
-                className="w-full bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white resize-none"
+                className="w-full bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white resize-none"
               />
               <button
                 type="submit"
                 className="w-full btn-liquid py-4 text-xs font-bold uppercase tracking-widest"
+                onMouseEnter={(e) =>
+                  (e.currentTarget.classList.add("active"))
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.classList.remove("active"))
+                }
               >
                 Send Request
               </button>

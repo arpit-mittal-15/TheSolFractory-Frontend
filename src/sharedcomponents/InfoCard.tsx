@@ -58,6 +58,8 @@ export default function InfoCard({
                 {title}
               </h2>
 
+              {!subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
+
               {subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
 
               {subtitle && (
@@ -116,6 +118,8 @@ export default function InfoCard({
               >
                 {title}
               </h2>
+
+              {!subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
 
               {subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
 

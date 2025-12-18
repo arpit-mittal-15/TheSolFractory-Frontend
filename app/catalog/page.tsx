@@ -5,8 +5,6 @@ import Footer from "@/src/components/Footer";
 import Navbar from "@/src/components/Navbar";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-// import { Checkbox } from "@/components/ui/checkbox";
-// import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
@@ -232,7 +230,7 @@ export default function CatalogPage() {
           {isMobile ? (null) : <aside className="w-full lg:w-1/5">
             <div className="glass-panel p-6 rounded-xl lg:sticky lg:top-32 max-h-[80vh] overflow-y-auto scrollbar-hide">
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
-                <h2 className="font-serif text-lg">Filters</h2>
+                <h2 className="font-serif text-lg" style={{ textShadow: "0 0 8px rgba(255,255,255,0.6)" }}>Filters</h2>
                 <button
                   onClick={clearFilters}
                   className="text-xs text-blue-400 hover:text-white transition-colors"
@@ -247,7 +245,7 @@ export default function CatalogPage() {
                   onClick={() => setPaperTypeOpen(!paperTypeOpen)}
                   className="flex items-center justify-between w-full mb-3 text-white"
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-300">
                     Material
                   </span>
                   {paperTypeOpen ? (
@@ -289,7 +287,7 @@ export default function CatalogPage() {
                   onClick={() => setSizeRangeOpen(!sizeRangeOpen)}
                   className="flex items-center justify-between w-full mb-3 text-white"
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-300">
                     Size Range [mm]
                   </span>
                   {sizeRangeOpen ? (
@@ -324,7 +322,7 @@ export default function CatalogPage() {
                   onClick={() => setLotSizeOpen(!lotSizeOpen)}
                   className="flex items-center justify-between w-full mb-3 text-white"
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-300">
                     Lot Size (Units)
                   </span>
                   {lotSizeOpen ? (
@@ -359,7 +357,7 @@ export default function CatalogPage() {
                   onClick={() => setPackagingOpen(!packagingOpen)}
                   className="flex items-center justify-between w-full mb-3 text-white"
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-gray-300">
                     Packaging
                   </span>
                   {packagingOpen ? (
@@ -512,10 +510,12 @@ export default function CatalogPage() {
                     className="glass-panel rounded-xl overflow-hidden group hover:-translate-y-2 transition-all duration-300"
                   >
                     <div className="aspect-[4/5] bg-white/5 p-6 flex items-center justify-center relative overflow-hidden">
-                      <img
+                      <Image
                         src={product.image}
                         alt={product.name}
-                        className="h-full object-contain drop-shadow-2xl group-hover:scale-110 transition duration-700"
+                        width={200}
+                        height={250}
+                        className="object-contain drop-shadow-2xl group-hover:scale-110 transition duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-end p-6">
                         <Button

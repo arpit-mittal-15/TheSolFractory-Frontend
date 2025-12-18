@@ -51,6 +51,16 @@ export default function Navbar() {
                 className={`nav-btn btn-liquid px-6 py-2 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white hover:active ${
                   isActive(link.href) ? "active" : ""
                 }`}
+                onMouseEnter={
+                  !isActive(link.href)
+                    ? (e) => e.currentTarget.classList.add("active")
+                    : undefined
+                }
+                onMouseLeave={
+                  !isActive(link.href)
+                    ? (e) => e.currentTarget.classList.remove("active")
+                    : undefined
+                }
               >
                 {link.label}
               </Link>
@@ -63,6 +73,16 @@ export default function Navbar() {
               className={`hidden lg:block auth-btn btn-liquid px-5 py-2 text-[12px] font-bold uppercase tracking-widest text-gray-300 hover:text-white ${
                 isActive("/login") ? "active" : ""
               }`}
+                onMouseEnter={
+                  !isActive("/login")
+                    ? (e) => e.currentTarget.classList.add("active")
+                    : undefined
+                }
+                onMouseLeave={
+                  !isActive("/login")
+                    ? (e) => e.currentTarget.classList.remove("active")
+                    : undefined
+                }
             >
               Login
             </Link>
@@ -71,6 +91,16 @@ export default function Navbar() {
               className={`hidden lg:block auth-btn btn-liquid px-5 py-2 text-[12px] font-bold uppercase tracking-widest text-white ${
                 isActive("/signup") ? "active" : ""
               }`}
+              onMouseEnter={
+                !isActive("/signup")
+                  ? (e) => e.currentTarget.classList.add("active")
+                  : undefined
+              }
+              onMouseLeave={
+                !isActive("/signup")
+                  ? (e) => e.currentTarget.classList.remove("active")
+                  : undefined
+              }
             >
               Sign Up
             </Link>
@@ -82,6 +112,12 @@ export default function Navbar() {
                          flex items-center justify-center
                          rounded-full"
               aria-label="Open cart"
+              // onMouseEnter={
+              //    (e) => e.currentTarget.classList.add("active")
+              // }
+              // onMouseLeave={
+              //   (e) => e.currentTarget.classList.remove("active")
+              // }
             >
               <span
                 className="btn-liquid w-full h-full flex items-center justify-center rounded-full overflow-hidden"

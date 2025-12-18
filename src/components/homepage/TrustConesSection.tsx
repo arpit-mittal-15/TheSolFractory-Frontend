@@ -49,7 +49,7 @@ export default function TrustConesSection() {
             backdrop-blur-lg 
             px-10 py-8 text-center mb-10
         ">
-          <h2 className="text-3xl md:text-4xl font-semibold text-white mb-3">
+          <h2 className="text-3xl md:text-4xl font-semibold text-white mb-3" style={{ textShadow: "0 0 8px rgba(255,255,255,0.6)" }}>
             Why Brands Trust Our Cones
           </h2>
 
@@ -64,7 +64,7 @@ export default function TrustConesSection() {
         {/* ───────── ✦ First Row (larger spacing) ✦ ───────── */}
         <div className="
             grid grid-cols-1 md:grid-cols-2 
-            gap-x-54 gap-y-20
+            gap-x-90 gap-y-20
             mb-30
         ">
           <AnimatedPinCard {...features[0]} />
@@ -74,7 +74,7 @@ export default function TrustConesSection() {
         {/* ───────── ✦ Second Row (smaller spacing) ✦ ───────── */}
         <div className="
             grid grid-cols-1 md:grid-cols-2 
-            gap-x-12 gap-y-16 mb-10
+            gap-x-24 gap-y-16 mb-10
         ">
           <AnimatedPinCard {...features[2]} />
           <AnimatedPinCard {...features[3]} />

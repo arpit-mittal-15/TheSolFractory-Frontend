@@ -32,7 +32,7 @@ export default function LoginPage() {
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            className="w-full bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+            className="w-full bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
           />
           <input
             type="password"
@@ -40,19 +40,25 @@ export default function LoginPage() {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="w-full bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+            className="w-full bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
           />
           <button
             type="submit"
-            className="btn-liquid w-full max-w-70 mt-4 mx-auto flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold uppercase tracking-widest 
+            className="hover:active btn-liquid w-full max-w-70 mt-4 mx-auto flex items-center justify-center gap-2 px-5 py-3 text-[13px] font-semibold uppercase tracking-widest 
                        text-gray-300 hover:text-white border-gray-500 rounded-3xl hover:bg-gray-800 transition border-2"
+            onMouseEnter={(e) =>
+              (e.currentTarget.classList.add("active"))
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.classList.remove("active"))  
+            }
           >
             Sign In
           </button>
         </form>
 
         <div className="mt-7 pt-6 border-t border-white/10 text-center">
-          <p className="text-[11px] uppercase tracking-widest text-gray-500 mb-6 mt-0">
+          <p className="text-[11px] uppercase tracking-widest text-gray-400 mb-6 mt-0">
             Or continue with
           </p>
           <div className="flex justify-center gap-4">
@@ -60,15 +66,21 @@ export default function LoginPage() {
               href="#"
               className="btn-liquid flex items-center justify-center gap-2 px-3 py-2 text-sm w-full max-w-70
                          font-semibold text-gray-300 hover:text-white border-gray-500 rounded-3xl hover:bg-gray-800 transition border-2"
+              onMouseEnter={(e) =>
+                (e.currentTarget.classList.add("active"))
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.classList.remove("active"))  
+              }
             >
-              <IconBrandGoogle className="w-5 h-5" />
+              <IconBrandGoogle className="w-5 h-6" />
               Continue with Google
             </a>
           </div>
         </div>
 
         <div className="text-center mt-6">
-          <span className="text-xs text-gray-500 mr-1">Don’t have an account?</span>
+          <span className="text-xs text-gray-400 mr-1">Don’t have an account?</span>
           <Link
             href="/signup"
             className="text-xs text-gray-300 hover:text-white transition"
