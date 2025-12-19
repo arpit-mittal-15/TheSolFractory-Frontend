@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { IconBrandGoogle } from '@tabler/icons-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function SignupPage() {
   const [form, setForm] = useState({
@@ -11,6 +13,7 @@ export default function SignupPage() {
     email: "",
     company: "",
   });
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -65,6 +68,23 @@ export default function SignupPage() {
             onChange={handleChange}
             className="w-full bg-black/40 placeholder:text-white/90 border border-white/10 rounded-lg p-4 text-sm text-white"
           />
+          
+          {/* Remember Me */}
+          <div className="flex items-center space-x-2 pt-1">
+            <Checkbox
+              id="remember-me-signup"
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked === true)}
+              className="border-white/20 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+            />
+            <Label
+              htmlFor="remember-me-signup"
+              className="text-sm text-gray-300 cursor-pointer hover:text-white transition"
+            >
+              Remember me
+            </Label>
+          </div>
+
           <button
             type="submit"
             className="btn-liquid w-full max-w-70 mt-5 mx-auto flex items-center justify-center gap-2 px-3 py-3 text-[12px] font-semibold uppercase tracking-widest 

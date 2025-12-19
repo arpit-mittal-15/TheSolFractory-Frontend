@@ -43,12 +43,12 @@ export default function Navbar() {
             />
           </Link>
 
-          <nav className="hidden lg:flex gap-4 ml-44">
+          <nav className="hidden lg:flex gap-4 ml-41">
             {navLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.href}
-                className={`nav-btn btn-liquid px-6 py-2 text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white hover:active ${
+                className={`nav-btn btn-liquid px-6 py-2 w-[120px] text-center text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white hover:active ${
                   isActive(link.href) ? "active" : ""
                 }`}
                 onMouseEnter={
@@ -70,7 +70,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className={`hidden lg:block auth-btn btn-liquid px-5 py-2 text-[12px] font-bold uppercase tracking-widest text-gray-300 hover:text-white ${
+              className={`lg:block auth-btn w-[120px] text-center items-center btn-liquid px-5 py-2 text-[12px] font-bold uppercase tracking-widest text-gray-300 hover:text-white ${
                 isActive("/login") ? "active" : ""
               }`}
                 onMouseEnter={
@@ -88,7 +88,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/signup"
-              className={`hidden lg:block auth-btn btn-liquid px-5 py-2 text-[12px] font-bold uppercase tracking-widest text-white ${
+              className={`hidden lg:block auth-btn btn-liquid w-30 text-center px-5 py-2 text-[12px] font-bold uppercase tracking-widest text-white ${
                 isActive("/signup") ? "active" : ""
               }`}
               onMouseEnter={

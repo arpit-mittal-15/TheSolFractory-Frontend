@@ -75,7 +75,7 @@ export default function MergedCards() {
 
       {/* 4 — Another paper style section */}
     {isMobile? null : <InfoCard
-            bgColor="#040E1C"
+            bgColor=""
             title="Packaging That Tells Tour Story"
             subtitle="Your product’s presentation matters. Choose from:"
             description=""
