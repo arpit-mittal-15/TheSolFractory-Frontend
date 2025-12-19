@@ -44,7 +44,7 @@ export default function InfoCard({
       style={{ backgroundColor: bgColor }}
       aria-labelledby={`card-title-${title.replace(/\s+/g, "-").toLowerCase()}`}
     >
-      <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center active ${isMobile ? "bor-shadow p-8 rounded-3xl active" : ""} `}> {/*  Add this -> bor-shadow p-8 rounded-3xl */}
+      <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center bor-shadow p-8 rounded-3xl active ${isMobile ? "bor-shadow p-8 rounded-3xl active" : ""} `}> {/*  Add this -> bor-shadow p-8 rounded-3xl */}
         {/* If imageOnRight === true, render text first then image.
             If false, render image first then text. */}
         {imageOnRight ? (

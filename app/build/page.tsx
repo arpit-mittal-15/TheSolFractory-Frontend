@@ -371,14 +371,14 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={() => window.history.back()}
-                  className="nav-btn btn-liquid md:w-48 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 px-5 py-6 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK TO CATALOG
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="nav-btn md:w-48 btn-liquid active px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn md:w-48 w-48 btn-liquid active px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   Next
                   <ArrowRight className="mr-2 h-4 w-4" />
@@ -391,7 +391,7 @@ export default function BuildPage() {
           {step === 2 && (
             <div className="space-y-6">
               <h1 className="text-3xl mt-14 md:text-4xl font-bold text-white text-center mb-10"style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
-                Select Your Filter / Tip
+                Select Your <span className="text-blue-400">Filter / Tip</span>
               </h1>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -450,14 +450,14 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  className="nav-btn btn-liquid md:w-48 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="nav-btn btn-liquid md:w-48 active px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 active px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   NEXT
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -470,7 +470,7 @@ export default function BuildPage() {
           {step === 3 && (
             <div className="space-y-6">
               <h1 className="text-3xl mt-14 md:text-4xl font-bold text-white text-center mb-10" style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
-                Choose Cone Size
+                Choose <span className="text-blue-400">Cone Size</span>
               </h1>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -531,14 +531,14 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  className="nav-btn btn-liquid md:w-48 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="nav-btn btn-liquid md:w-48 active px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 active px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   NEXT
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -551,7 +551,7 @@ export default function BuildPage() {
           {step === 4 && (
             <div className="space-y-6">
               <h1 className="text-3xl mt-14 md:text-4xl font-bold text-white text-center mb-10" style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
-                Select Your Lot Size
+                Select Your <span className="text-blue-400">Lot Size</span>
               </h1>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -655,14 +655,14 @@ export default function BuildPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  className="nav-btn btn-liquid md:w-48 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   BACK
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="nav-btn btn-liquid md:w-48 active px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                  className="nav-btn btn-liquid md:w-48 active px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                 >
                   NEXT
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -675,7 +675,7 @@ export default function BuildPage() {
           {step === 5 && (
             <div className="space-y-6 max-w-5xl mx-auto">
               <h1 className="text-3xl mt-14 md:text-4xl font-bold text-white text-center mb-9" style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
-                Where Are You Located?
+                Where Are You <span className="text-blue-400">Located?</span>
               </h1>
 
               <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5">
@@ -731,14 +731,14 @@ export default function BuildPage() {
                     <Button
                       variant="outline"
                       onClick={prevStep}
-                      className="nav-btn btn-liquid md:w-48 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                      className="nav-btn btn-liquid md:w-48 px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       BACK
                     </Button>
                     <Button
                       onClick={handleAddToCart}
-                      className="nav-btn btn-liquid md:w-48 active px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
+                      className="nav-btn btn-liquid md:w-48 active px-5 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white"
                     >
                       ADD TO CART
                     </Button>

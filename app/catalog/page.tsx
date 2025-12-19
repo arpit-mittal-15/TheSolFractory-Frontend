@@ -188,7 +188,7 @@ export default function CatalogPage() {
           <div className="px-4 md:px-0">
             <div className="text-center mb-6">
               <h1 className="text-4xl md:text-5xl font-serif mb-3"
-              style={{ textShadow: "0 0 5px rgba(255,255,255,0.6)" }}>
+              style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
                 Wholesale <span className="text-blue-400">Inventory</span>
               </h1>
               <p className="text-gray-400 text-sm">
