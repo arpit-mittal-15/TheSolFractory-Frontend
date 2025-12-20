@@ -19,7 +19,7 @@ export default function SolFactoryAdvantage() {
     <section className="w-full py-14 px-6 flex flex-col items-center">
 
       {/* TITLE */}
-      <h2 className="text-white text-3xl md:text-4xl font-bold text-center mb-10" style={{ textShadow: "0 0 5px rgba(255,255,255,0.6)" }}>
+      <h2 className="text-white text-3xl md:text-4xl font-bold text-center mb-10" style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
         The SOL Factory Advantage
       </h2>
 

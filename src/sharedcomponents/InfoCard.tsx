@@ -8,9 +8,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 type ImageEffect =
   | { type: "none" }
   | { type: "lens" }
-  | { type: "marquee"}
+  | { type: "marquee" }
   | { type: "compare"; secondImage: string };
-
 
 interface InfoCardProps {
   bgColor?: string;
@@ -20,7 +19,7 @@ interface InfoCardProps {
   bullets: string[];
   footer?: string;
   image: string;
-  imageOnRight?: boolean; // true = image right, false = image left
+  imageOnRight?: boolean;
   imageEffect?: ImageEffect;
 }
 
@@ -33,9 +32,8 @@ export default function InfoCard({
   footer,
   image,
   imageOnRight = true,
-  imageEffect,
+  imageEffect = { type: "none" },
 }: InfoCardProps) {
-
   const isMobile = useIsMobile();
 
   return (
@@ -44,106 +42,51 @@ export default function InfoCard({
       style={{ backgroundColor: bgColor }}
       aria-labelledby={`card-title-${title.replace(/\s+/g, "-").toLowerCase()}`}
     >
-      <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center bor-shadow p-8 rounded-3xl active ${isMobile ? "bor-shadow p-8 rounded-3xl active" : ""} `}> {/*  Add this -> bor-shadow p-8 rounded-3xl */}
-        {/* If imageOnRight === true, render text first then image.
-            If false, render image first then text. */}
+      <div
+        className={`
+          max-w-7xl mx-auto
+          grid grid-cols-1 md:grid-cols-2
+          gap-8
+          items-stretch
+          bor-shadow p-8 rounded-3xl
+          ${isMobile ? "active" : ""}
+        `}
+      >
         {imageOnRight ? (
           <>
             {/* TEXT */}
-            <div>
-              <h2
-                id={`card-title-${title.replace(/\s+/g, "-").toLowerCase()}`}
-                className="text-3xl md:text-4xl font-semibold mb-4"
-              >
-                {title}
-              </h2>
-
-              {!subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
-
-              {subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
-
-              {subtitle && (
-                <p className="text-gray-300 mb-6 leading-relaxed">{subtitle}</p>
-              )}
-
-              {description && (
-                <p className="text-gray-300 mb-6 leading-relaxed">{description}</p>
-              )}
-
-              <ul className="space-y-4 text-gray-200">
-                {bullets.map((b, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <Check className="h-5 w-5 mt-0.5" />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {footer && (
-                <p className="text-gray-300 leading-relaxed mt-6">{footer}</p>
-              )}
-            </div>
+            <TextBlock
+              title={title}
+              subtitle={subtitle}
+              description={description}
+              bullets={bullets}
+              footer={footer}
+            />
 
             {/* IMAGE */}
-            <div>
-              <AnimatedImage
-                src={image}
-                alt={`${title} image`}
-                width={1400}
-                height={800}
-                className="rounded-2xl object-cover w-full"
-                effect={imageEffect}
-              />
-            </div>
+            <ImageBlock
+              image={image}
+              title={title}
+              effect={imageEffect}
+            />
           </>
-        )  : (
+        ) : (
           <>
-            {/* IMAGE (left) */}
-            <div>
-              <AnimatedImage
-                src={image}
-                alt={`${title} image`}
-                width={1400}
-                height={800}
-                className="rounded-2xl object-cover w-full"
-                effect={imageEffect}
-              />
-            </div>
+            {/* IMAGE */}
+            <ImageBlock
+              image={image}
+              title={title}
+              effect={imageEffect}
+            />
 
-            {/* TEXT (right) */}
-            <div>
-              <h2
-                id={`card-title-${title.replace(/\s+/g, "-").toLowerCase()}`}
-                className="text-3xl md:text-4xl font-semibold mb-4"
-              >
-                {title}
-              </h2>
-
-              {!subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
-
-              {subtitle && <div className="h-0.5 w-16 bg-white mb-6" />}
-
-              {subtitle && (
-                <p className="text-gray-300 mb-6 leading-relaxed">{subtitle}</p>
-              )}
-
-              {description && (
-                <p className="text-gray-300 mb-6 leading-relaxed">{description}</p>
-              )}
-
-              <ul className="space-y-4 text-gray-200">
-                {bullets.map((b, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <Check className="h-5 w-5 mt-0.5" />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {footer && (
-                <p className="text-gray-300 leading-relaxed mt-6">{footer}</p>
-              )}
-            </div>
+            {/* TEXT */}
+            <TextBlock
+              title={title}
+              subtitle={subtitle}
+              description={description}
+              bullets={bullets}
+              footer={footer}
+            />
           </>
         )}
       </div>
@@ -151,20 +94,103 @@ export default function InfoCard({
   );
 }
 
+/* ---------------- TEXT BLOCK ---------------- */
+
+function TextBlock({
+  title,
+  subtitle,
+  description,
+  bullets,
+  footer,
+}: {
+  title: string;
+  subtitle?: string;
+  description: string;
+  bullets: string[];
+  footer?: string;
+}) {
+  return (
+    <div className="flex flex-col justify-center h-full gap-0">
+      <h2
+        id={`card-title-${title.replace(/\s+/g, "-").toLowerCase()}`}
+        className="text-3xl md:text-[25px] font-semibold mb-2"
+      >
+        {title}
+      </h2>
+
+      <div className="h-0.5 w-16 bg-white mb-4" />
+
+      {subtitle && (
+        <p className="text-gray-300 mb-4 leading-relaxed">
+          {subtitle}
+        </p>
+      )}
+
+      {description && (
+        <p className="text-gray-300 mb-4 leading-relaxed">
+          {description}
+        </p>
+      )}
+
+      <ul className="space-y-2 text-gray-200">
+        {bullets.map((b, idx) => (
+          <li key={idx} className="flex items-start gap-3 text-[15px]">
+            <Check className="h-5 w-5 mt-0.5 shrink-0" />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+
+      {footer && (
+        <p className="text-gray-300 leading-relaxed mt-4 text-[16px]">
+          {footer}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- IMAGE BLOCK ---------------- */
+
+function ImageBlock({
+  image,
+  title,
+  effect,
+}: {
+  image: string;
+  title: string;
+  effect: ImageEffect;
+}) {
+  return (
+    <div className="h-full w-full">
+      <AnimatedImage
+        src={image}
+        alt={`${title} image`}
+        width={1400}
+        height={800}
+        className="rounded-2xl object-cover w-full h-full"
+        effect={effect}
+      />
+    </div>
+  );
+}
+
+/* ---------------- IMAGE EFFECT HANDLER ---------------- */
+
 function AnimatedImage({
   src,
   alt,
   width,
   height,
   className,
-  effect = { type: "none" },
+  effect,
 }: {
   src: string;
   alt: string;
   width: number;
   height: number;
   className?: string;
-  effect?: ImageEffect;
+  effect: ImageEffect;
 }) {
   switch (effect.type) {
     case "compare":
@@ -178,9 +204,7 @@ function AnimatedImage({
       );
 
     case "marquee":
-      return (
-        <Marquee3D width={width} height={height} />
-      );
+      return <Marquee3D width={width} height={height} />;
 
     case "lens":
       return (
@@ -205,5 +229,3 @@ function AnimatedImage({
       );
   }
 }
-
-

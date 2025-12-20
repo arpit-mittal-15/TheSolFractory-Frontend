@@ -48,7 +48,7 @@ export default function Navbar() {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`nav-btn btn-liquid px-6 py-2 w-[120px] text-center text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white hover:active ${
+                className={`nav-btn btn-liquid px-6 py-2 w-30 text-center text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white hover:active ${
                   isActive(link.href) ? "active" : ""
                 }`}
                 onMouseEnter={

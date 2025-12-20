@@ -27,7 +27,7 @@ const HeroSection: React.FC = () => {
       </h1>
       <p
         className="text-lg md:text-xl text-gray-300 mb-8"
-        style={{ textShadow: "0 0 5px rgba(255,255,255,0.6)" }}
+        style={{ textShadow: "0 0 1px rgba(255,255,255,0.6)" }}
       >
         Exceptional quality. Endless customization. True scalability.
       </p>

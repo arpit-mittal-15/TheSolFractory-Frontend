@@ -12,7 +12,7 @@ export default function MergedCards() {
   return (
     <div>
 
-    <h1 className="text-center text-white mt-11 px-6" style={{ textShadow: "0 0 5px rgba(255,255,255,0.6)" }}>
+    <h1 className="text-center text-white mt-11 px-6" style={{ textShadow: "0 0 4px rgba(255,255,255,0.6)" }}>
       <span className="block text-3xl md:text-4xl font-serif">
         Create Your Perfect Cone:
       </span>

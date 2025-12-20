@@ -4,98 +4,28 @@ import React, { useState, useEffect } from "react";
 import Footer from "@/src/components/Footer";
 import Navbar from "@/src/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { products } from "@/sampledata/products";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/src/contexts/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CatalogPageSkeleton from "@/src/components/skeletons/CatalogPageSkeleton";
 import { toast } from "sonner";
 
 // Mock product data
-const products = [
-  {
-    id: "1",
-    name: "Premium Silk Coated Stock",
-    paperType: "Hemp",
-    size: "A4 (210x297mm)",
-    price: 250,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "2",
-    name: "Premium Silk Coated Stock",
-    paperType: "Natural",
-    size: "A4 (210x297mm)",
-    price: 210,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "3",
-    name: "Premium Silk Coated Stock",
-    paperType: "Organic",
-    size: "A4 (210x297mm)",
-    price: 150,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "4",
-    name: "Premium Silk Coated Stock",
-    paperType: "Rice",
-    size: "A4 (210x297mm)",
-    price: 200,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "5",
-    name: "Premium Silk Coated Stock",
-    paperType: "Blunt",
-    size: "A4 (210x297mm)",
-    price: 180,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "6",
-    name: "Premium Silk Coated Stock",
-    paperType: "Hemp",
-    size: "A4 (210x297mm)",
-    price: 220,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "7",
-    name: "Premium Silk Coated Stock",
-    paperType: "Natural",
-    size: "A4 (210x297mm)",
-    price: 190,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "8",
-    name: "Premium Silk Coated Stock",
-    paperType: "Organic",
-    size: "A4 (210x297mm)",
-    price: 160,
-    image: "/homepage/conestack.png",
-  },
-  {
-    id: "9",
-    name: "Premium Silk Coated Stock",
-    paperType: "Rice",
-    size: "A4 (210x297mm)",
-    price: 240,
-    image: "/homepage/conestack.png",
-  },
-];
 
 const paperTypes = ["Blunt", "Hemp", "Natural", "Organic", "Rice"];
 const packagingOptions = ["Tube", "Box", "Wrapped Bundle", "Custom"];
 
 const heroSlides = [
-  { src: "/homepage/conestack.png", label: "Natural Hemp Cones" },
-  { src: "/homepage/sizechart.png", label: "Precision Size Options" },
-  { src: "/homepage/conestack.png", label: "Production-Ready Inventory" },
+  { src: "/bluetshirt.png", label: "Natural Hemp Cones" },
+  { src: "/whitetshirt.png", label: "Precision Size Options" },
+  { src: "/brochureimages/u9.jpeg", label: "Production-Ready Inventory" },
+  { src: "/brochureimages/u15.jpeg", label: "Natural Hemp Cones" },
+  { src: "/brochureimages/u12.jpeg", label: "Precision Size Options" },
+  { src: "/brochureimages/u11.jpeg", label: "Precision Size Options" },
 ];
 
 export default function CatalogPage() {
@@ -111,6 +41,14 @@ export default function CatalogPage() {
 
   // Hero slider state
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Create extended slides array with duplicate first slide at the end for seamless loop
+  const extendedSlides = [...heroSlides, heroSlides[0]];
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12;
 
   // Collapsible filter states
   const [paperTypeOpen, setPaperTypeOpen] = useState(false);
@@ -137,11 +75,37 @@ export default function CatalogPage() {
   // Auto-advance hero slider on desktop
   useEffect(() => {
     if (isMobile) return;
+
     const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+      setActiveSlide((prev) => {
+        // Advance to next slide, including the duplicate first slide
+        return prev + 1;
+      });
     }, 3500);
+
     return () => clearInterval(interval);
   }, [isMobile]);
+
+  // Handle seamless loop reset when we reach the duplicate first slide
+  useEffect(() => {
+    if (isMobile) return;
+    
+    // When we reach the duplicate first slide (index = heroSlides.length)
+    if (activeSlide === heroSlides.length) {
+      // Wait for the transition to complete, then reset to 0 without animation
+      const resetTimeout = setTimeout(() => {
+        setIsTransitioning(true);
+        setActiveSlide(0);
+        // Re-enable transitions after a brief moment
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 50);
+      }, 700); // Wait for transition duration (700ms)
+
+      return () => clearTimeout(resetTimeout);
+    }
+  }, [activeSlide, heroSlides.length, isMobile]);
+
 
   const handleAddToCart = (product: typeof products[0]) => {
     addItem({
@@ -177,6 +141,39 @@ export default function CatalogPage() {
     return true;
   });
 
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "featured":
+      default:
+        return 0; // Keep original order
+    }
+  });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedPaperTypes, selectedPackaging, sortBy]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of the page
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   if (isMobile === null) return <CatalogPageSkeleton />;
 
   return (
@@ -184,9 +181,9 @@ export default function CatalogPage() {
       <Navbar />
       <main className="pt-24 md:pt-32 pb-20">
         {/* Header Section */}
-        <div className="max-w-400 mx-auto px-0 md:px-6 mb-10">
+        <div className="max-w-400 mx-auto px-0 md:px-6 mb-12">
           <div className="px-4 md:px-0">
-            <div className="text-center mb-6">
+            <div className="text-center mb-[55px]">
               <h1 className="text-4xl md:text-5xl font-serif mb-3"
               style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
                 Wholesale <span className="text-blue-400">Inventory</span>
@@ -198,29 +195,45 @@ export default function CatalogPage() {
           </div>
 
           {/* Full-width hero image slider (one image at a time, reduced height) */}
-          {isMobile? null : <div className="w-full h-48 md:h-64 relative rounded-2xl overflow-hidden bor-shadow backdrop-blur-lg border border-white/15">
-            {heroSlides.map((slide, idx) => (
+          {isMobile ? null : (
+            <div className="w-full h-48 md:h-64 relative rounded-2xl overflow-hidden backdrop-blur-lg">
+              {/* Slider Track */}
               <div
-                key={idx}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                  idx === activeSlide ? "opacity-100" : "opacity-0 pointer-events-none"
-                }`}
+                className="flex h-full"
+                style={{
+                  transform: `translateX(-${activeSlide * 92}%)`,
+                  transition: isTransitioning ? 'none' : 'transform 700ms ease-in-out',
+                }}
               >
-                <Image
-                  src={slide.src}
-                  alt={slide.label}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  priority={idx === activeSlide} // optional: preload current slide
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-6 py-3 flex items-end">
-                  <p className="text-white text-sm md:text-base font-semibold">
-                    {slide.label}
-                  </p>
-                </div>
+                {extendedSlides.map((slide, idx) => (
+                  <div
+                    key={idx}
+                    className="relative h-full flex-shrink-0"
+                    style={{
+                      width: "92%", // 👈 leaves space for next image peek
+                      marginRight: "2%",
+                    }}
+                  >
+                    <Image
+                      src={slide.src}
+                      alt={slide.label}
+                      fill
+                      className="object-cover rounded-2xl"
+                      priority={idx === activeSlide || (activeSlide === heroSlides.length && idx === 0)}
+                    />
+
+                    {/* Label */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-6 py-3 flex items-end rounded-b-2xl">
+                      <p className="text-white text-sm md:text-base font-semibold">
+                        {slide.label}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>}
+            </div>
+          )}
+
 
         </div>
 
@@ -228,7 +241,7 @@ export default function CatalogPage() {
         <div className="max-w-400 mx-auto px-4 md:px-6 flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           {isMobile ? (null) : <aside className="w-full lg:w-1/5">
-            <div className="glass-panel p-6 rounded-xl lg:sticky lg:top-32 max-h-[80vh] overflow-y-auto scrollbar-hide">
+            <div className="glass-panel p-6 rounded-xl lg:sticky lg:top-24 mt-22 max-h-[80vh] overflow-y-auto scrollbar-hide">
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
                 <h2 className="font-serif text-lg" style={{ textShadow: "0 0 2px rgba(255,255,255,0.6)" }}>Filters</h2>
                 {/* <button
@@ -487,7 +500,7 @@ export default function CatalogPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-11 mt-1">
               <h2 className="text-2xl md:text-3xl font-serif" style={{ textShadow: "0 0 5px rgba(255,255,255,0.6)" }}>Products</h2>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-45 btn-glass-panel bg-blue-100 border-white/10 text-white px-3 py-2 h-10">
@@ -503,7 +516,7 @@ export default function CatalogPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => {
+              {paginatedProducts.map((product) => {
                 const description = `${product.paperType} • ${product.size}`;
                 return (
                   <div
@@ -545,10 +558,130 @@ export default function CatalogPage() {
                 );
               })}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center">
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </div>
         </div>
       </main>
         <Footer />
+    </div>
+  );
+}
+
+// Pagination Controls Component
+function PaginationControls({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) {
+      // Show all pages if total is less than max visible
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (currentPage > 3) {
+        pages.push("...");
+      }
+
+      // Show pages around current page
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage < totalPages - 2) {
+        pages.push("...");
+      }
+
+      // Always show last page
+      if (totalPages > 1) {
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="btn-glass-panel bg-black/40 border-white/10 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        <span className="hidden sm:inline ml-1">Previous</span>
+      </Button>
+
+      <div className="flex items-center gap-1">
+        {getPageNumbers().map((page, index) => {
+          if (page === "...") {
+            return (
+              <span
+                key={`ellipsis-${index}`}
+                className="px-3 py-2 text-gray-400"
+              >
+                ...
+              </span>
+            );
+          }
+
+          const pageNumber = page as number;
+          const isActive = currentPage === pageNumber;
+
+          return (
+            <Button
+              key={pageNumber}
+              variant={isActive ? "default" : "outline"}
+              size="sm"
+              onClick={() => onPageChange(pageNumber)}
+              className={
+                isActive
+                  ? "btn-liquid btn-primary text-white"
+                  : "btn-glass-panel bg-black/40 border-white/10 text-gray-300 hover:text-white"
+              }
+            >
+              {pageNumber}
+            </Button>
+          );
+        })}
+      </div>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="btn-glass-panel bg-black/40 border-white/10 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span className="hidden sm:inline mr-1">Next</span>
+        <ChevronRight className="h-4 w-4" />
+      </Button>
     </div>
   );
 }

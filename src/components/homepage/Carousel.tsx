@@ -58,6 +58,12 @@ export default function Carousel() {
                   offset === 0
                     ? 0
                     : offset * 140 + (offset > 0 ? 60 : -60),
+                y:
+                    offset === 0
+                      ? 0
+                      : Math.abs(offset) === 1
+                      ? -70
+                      : -120,
                 scale: offset === 0 ? 1 : 0.88,
                 opacity: 1,
                 zIndex: 10 - Math.abs(offset),
@@ -96,7 +102,7 @@ export default function Carousel() {
 function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
   return (
     <div
-      className="relative w-[320px] h-105 rounded-xl overflow-hidden transition-all duration-300 ease-in-out"
+      className="relative w-[300px] h-100 rounded-xl overflow-hidden transition-all duration-300 ease-in-out"
       style={{
         background: "rgba(19, 33, 53, 0.5)",
         backdropFilter: "blur(30px)",
@@ -120,7 +126,7 @@ function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
         alt={item.label}
         fill
         sizes="(max-width: 768px) 90vw, 320px"
-        className={`object-cover border rounded-xl ${isActive ? 'opacity-90' : 'opacity-60'}`}
+        className={`object-cover border rounded-xl ${isActive ? 'opacity-100' : 'opacity-55'}`}
       />
 
       {/* FULL IMAGE INNER BORDER (ALWAYS VISIBLE) */}
