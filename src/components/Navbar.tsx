@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { ShoppingCartDialog } from "@/components/ShoppingCartDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/src/contexts/CartContext";
-import BurningCigarette from "./BurningCigarette";
 
 const navLinks = [
   { id: "home", label: "Home", href: "/" },
@@ -32,7 +31,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed w-full z-50 border-b border-white/5 bg-[#132135]/80 backdrop-blur-xl transition-all duration-300">
+      <header className="fixed w-full border-b bg-[#132135] z-50 border-white/5  backdrop-blur-xl transition-all duration-300">
         <div className="max-w-350 mx-auto px-4 md:px-6 h-20 flex justify-between items-center relative z-50">
           <div className="flex items-center gap-3">
             <Link href="/" className="h-10 md:h-14 block group cursor-pointer ml-3">
