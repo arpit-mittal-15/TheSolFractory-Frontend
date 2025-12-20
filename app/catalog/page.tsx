@@ -632,7 +632,7 @@ function PaginationControls({
         size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="btn-glass-panel bg-black/40 border-white/10 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-glass-panel cursor-pointer bg-black/40 border-white/10 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeft className="h-4 w-4" />
         <span className="hidden sm:inline ml-1">Previous</span>
@@ -655,7 +655,8 @@ function PaginationControls({
           const isActive = currentPage === pageNumber;
 
           return (
-            <Button
+            <>
+            {!isActive ? null : <Button
               key={pageNumber}
               variant={isActive ? "default" : "outline"}
               size="sm"
@@ -667,7 +668,8 @@ function PaginationControls({
               }
             >
               {pageNumber}
-            </Button>
+            </Button>}
+            </>
           );
         })}
       </div>
@@ -677,7 +679,7 @@ function PaginationControls({
         size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="btn-glass-panel bg-black/40 border-white/10 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-glass-panel cursor-pointer bg-black/40 border-white/10 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="hidden sm:inline mr-1">Next</span>
         <ChevronRight className="h-4 w-4" />

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { IconBrandGoogle } from "@tabler/icons-react";
+import { IconBrandGoogle, IconEye, IconEyeOff } from '@tabler/icons-react';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
@@ -17,6 +17,8 @@ export default function SignupPage() {
   });
 
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -39,8 +41,8 @@ export default function SignupPage() {
       <div className="glass-panel w-full max-w-lg p-6 sm:p-8 md:p-10 relative z-10 mb-13">
         {/* Heading */}
         <h2
-          className="text-3xl font-serif text-center mb-8 w-full max-w-[450px] mx-auto"
-          style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}
+          className="text-3xl font-serif text-center mb-8 w-full max-w-112.5 mx-auto"
+          style={{ textShadow: "0 0 2px rgba(255,255,255,0.6)" }}
         >
           Sign Up to <span className="text-blue-400">SOL Factory</span>
         </h2>
@@ -89,22 +91,50 @@ export default function SignupPage() {
 
           {/* Password */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
               value={form.password}
               onChange={handleChange}
-              className="bg-black/40 border border-white/10 placeholder:text-white/50 rounded-lg p-4 text-sm text-white outline-none focus:border-blue-500 transition"
+              className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 pr-12 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <IconEyeOff className="mr-1.5 w-5 h-5" />
+              ) : (
+                <IconEye className="mr-1.5 w-5 h-5" />
+              )}
+            </button>
+          </div>
+          <div className="relative">
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               placeholder="Confirm Password"
               value={form.confirmPassword}
               onChange={handleChange}
-              className="bg-black/40 border border-white/10 placeholder:text-white/50 rounded-lg p-4 text-sm text-white outline-none focus:border-blue-500 transition"
+              className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 pr-12 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
             />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            >
+              {showConfirmPassword ? (
+                <IconEyeOff className="mr-1.5 w-5 h-5" />
+              ) : (
+                <IconEye className="mr-1.5 w-5 h-5" />
+              )}
+            </button>
+          </div>
           </div>
 
           {/* Terms */}
@@ -141,14 +171,8 @@ export default function SignupPage() {
           {/* Submit */}
           <button
             type="submit"
-            disabled={!agreeTerms}
-            className={`btn-liquid flex items-center justify-center mt-8 sm:mt-12 px-4 py-3 text-sm w-full max-w-72 mx-auto
-              font-semibold rounded-3xl border-2 transition
-              ${
-                agreeTerms
-                  ? "text-gray-300 hover:text-white border-gray-500 hover:bg-gray-800"
-                  : "text-gray-500 border-gray-700 opacity-60 cursor-not-allowed"
-              }`}
+            className="hover:active btn-liquid active w-full max-w-70 mt-13.5 mx-auto flex items-center justify-center gap-2 px-5 py-3 text-[13px] font-semibold uppercase tracking-widest 
+                       text-gray-300 hover:text-white border-gray-500 rounded-3xl hover:bg-gray-800 transition border-2"
           >
             Sign Up
           </button>
