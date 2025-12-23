@@ -5,7 +5,6 @@ import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import { useCart } from "@/src/contexts/CartContext";
 import { toast } from "sonner";
-import Header from "@/src/components/build/Header";
 import Step0 from "@/src/components/build/Step0";
 import Step1 from "@/src/components/build/Step1";
 import Step2 from "@/src/components/build/Step2";
@@ -38,13 +37,6 @@ export default function BuildPage() {
 
   const updateState = (updates: Partial<CustomizationState>) => {
     setState((prev) => ({ ...prev, ...updates }));
-  };
-
-  const selectAndNext = (updates: Partial<CustomizationState>) => {
-    updateState(updates);
-    setTimeout(() => {
-      if (step < 5) setStep((prev) => Math.min(prev + 1, 5));
-    }, 120);
   };
 
   const nextStep = () => {
@@ -115,6 +107,7 @@ export default function BuildPage() {
               state={state}
               updateState={updateState}
               nextStep={nextStep}
+              prevStep={prevStep}
             />
           )}
 
@@ -123,7 +116,7 @@ export default function BuildPage() {
             <Step2
               step={step}
               state={state}
-              selectAndNext={selectAndNext}
+              updateState={updateState}
               prevStep={prevStep}
               nextStep={nextStep}
             />
@@ -134,7 +127,7 @@ export default function BuildPage() {
             <Step3
               step={step}
               state={state}
-              selectAndNext={selectAndNext}
+              updateState={updateState}
               prevStep={prevStep}
               nextStep={nextStep}
             />
@@ -146,7 +139,6 @@ export default function BuildPage() {
               step={step}
               state={state}
               updateState={updateState}
-              selectAndNext={selectAndNext}
               prevStep={prevStep}
               nextStep={nextStep}
             />

@@ -5,6 +5,7 @@ import React, {
   useEffect,
   ElementType,
   ComponentPropsWithoutRef,
+  ComponentType,
 } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,8 @@ export function HoverBorderGradient<T extends ElementType = "button">({
   clockwise = true,
   ...props
 }: HoverBorderGradientProps<T>) {
-  const Tag = as || "button";
+  // Cast to a generic React component type so TypeScript allows children correctly
+  const Tag = (as || "button") as ComponentType<any>;
 
   const [hovered, setHovered] = useState(false);
   const [direction, setDirection] = useState<Direction>("TOP");
@@ -70,7 +72,7 @@ export function HoverBorderGradient<T extends ElementType = "button">({
 
   return (
     <Tag
-      {...props}
+      {...(props as ComponentPropsWithoutRef<any>)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(

@@ -1,17 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowLeft, ArrowRight } from "lucide-react";
-import {
-  FILTER_TYPES,
-  type CustomizationState,
-  getFilterTypeName,
-} from "./types";
+import { FILTER_TYPES, type CustomizationState } from "./types";
 import Header from "./Header";
+import ConeViewer from "./ConeViewer";
 
 interface Step2Props {
   step: number;
   state: CustomizationState;
-  selectAndNext: (updates: Partial<CustomizationState>) => void;
+  updateState: (updates: Partial<CustomizationState>) => void;
   prevStep: () => void;
   nextStep: () => void;
 }
@@ -19,7 +16,7 @@ interface Step2Props {
 const Step2: React.FC<Step2Props> = ({
   step,
   state,
-  selectAndNext,
+  updateState,
   prevStep,
   nextStep,
 }) => {
@@ -30,25 +27,13 @@ const Step2: React.FC<Step2Props> = ({
       <Header step={step} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-7 items-start">
-        {/* Visual Preview */}
-        <div className="bg-[#E8E8E8] rounded-xl border border-blue-400/40 shadow-[0_0_18px_rgba(59,130,246,0.25)] p-4 min-h-[360px]">
-          <div className="bg-[#0A0F1A] text-white rounded-lg border border-blue-500/40 shadow-[0_0_18px_rgba(59,130,246,0.25)] p-3 h-full">
-            <h2 className="text-lg font-semibold mb-3">Visual Preview</h2>
-            <div className="bg-white rounded-lg p-4 flex flex-col items-center justify-center min-h-[250px]">
-              {state.filterType ? (
-                <>
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-b from-gray-100 to-gray-300 border border-gray-200 mb-3"></div>
-                  <p className="text-gray-900 font-medium text-center">
-                    {getFilterTypeName(state.filterType)}
-                  </p>
-                </>
-              ) : (
-                <p className="text-gray-700 text-sm text-center">
-                  Select a filter to preview it here.
-                </p>
-              )}
-            </div>
-          </div>
+        {/* Visual Preview - 3D Cone */}
+        <div className="space-y-4">
+          <ConeViewer state={state} focusStep="filter" />
+          <p className="text-xs md:text-sm text-gray-400 text-center max-w-md mx-auto">
+            Filters update the tip of your cone. Rotate the model and select different
+            filters to see how they change the look.
+          </p>
         </div>
 
         {/* Filter Options */}
@@ -59,7 +44,7 @@ const Step2: React.FC<Step2Props> = ({
             return (
               <button
                 key={filter.id}
-                onClick={() => selectAndNext({ filterType: filter.id })}
+                onClick={() => updateState({ filterType: filter.id })}
                 className={`relative rounded-lg p-5 border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
                   isSelected
                     ? "active border-blue-400 shadow-[0_0_18px_rgba(59,130,246,0.45)]"
@@ -89,7 +74,7 @@ const Step2: React.FC<Step2Props> = ({
           <div className="flex justify-between items-center">
             <Button
               variant="outline"
-              onClick={() => window.history.back()}
+              onClick={prevStep}
               className="btn-liquid px-6 ml-3 py-5 text-sm font-bold uppercase tracking-widest text-gray-300 hover:text-white border-gray-700"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
@@ -97,7 +82,7 @@ const Step2: React.FC<Step2Props> = ({
             </Button>
             <Button
               onClick={nextStep}
-              disabled={!state.paperType}
+              disabled={!state.filterType}
               className="btn-liquid active ml-87 px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT

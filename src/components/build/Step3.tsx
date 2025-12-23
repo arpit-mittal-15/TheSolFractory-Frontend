@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { IconTrafficCone } from "@tabler/icons-react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Header from "./Header";
+import ConeViewer from "./ConeViewer";
 import { CONE_SIZES, type CustomizationState } from "./types";
 
 interface Step3Props {
   step: number;
   state: CustomizationState;
-  selectAndNext: (updates: Partial<CustomizationState>) => void;
+  updateState: (updates: Partial<CustomizationState>) => void;
   prevStep: () => void;
   nextStep: () => void;
 }
@@ -16,7 +17,7 @@ interface Step3Props {
 const Step3: React.FC<Step3Props> = ({
   step,
   state,
-  selectAndNext,
+  updateState,
   prevStep,
   nextStep,
 }) => {
@@ -27,35 +28,12 @@ const Step3: React.FC<Step3Props> = ({
       <Header step={step} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-7 items-start">
-        {/* Visual Preview */}
-        <div className="bg-[#E8E8E8] rounded-xl border border-blue-400/40 shadow-[0_0_18px_rgba(59,130,246,0.25)] p-10 min-h-[400px] flex flex-col">
-          <div className="text-center text-gray-900 text-lg font-semibold mb-2">
-            Visual Preview
-          </div>
-          <div className="text-red-600 font-medium text-sm text-center mb-3">
-            Current Size:
-          </div>
-          <div className="text-gray-900 font-semibold text-base text-center mb-4">
-            {state.coneSize
-              ? `${state.coneSize} Length x 5mm Diameter`
-              : "Pick a size to preview"}
-          </div>
-          <div className="flex-1 flex items-center justify-center">
-            {state.coneSize ? (
-              <div className="flex flex-col items-center space-y-2">
-                <IconTrafficCone size={72} stroke={1.2} />
-                <p className="text-gray-800 text-sm">Approximate preview</p>
-              </div>
-            ) : (
-              <p className="text-gray-700 text-sm text-center">
-                Select a size to see a preview.
-              </p>
-            )}
-          </div>
-          <p className="text-gray-700 text-xs md:text-sm mt-3 text-center">
-            {state.coneSize
-              ? `Your custom cone will be ${state.coneSize} long and 5mm in diameter.`
-              : "Choose a size to continue."}
+        {/* Visual Preview - 3D Cone */}
+        <div className="space-y-4">
+          <ConeViewer state={state} focusStep="size" />
+          <p className="text-xs md:text-sm text-gray-400 text-center max-w-md mx-auto">
+            Sizes change the length and proportions of your cone. Rotate to see how each
+            size feels with your current paper and filter choices.
           </p>
         </div>
 
@@ -66,7 +44,7 @@ const Step3: React.FC<Step3Props> = ({
             return (
               <button
                 key={size.id}
-                onClick={() => selectAndNext({ coneSize: size.id })}
+                onClick={() => updateState({ coneSize: size.id })}
                 className={`relative rounded-lg p-5 border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
                   isSelected
                     ? "active border-blue-400 shadow-[0_0_18px_rgba(59,130,246,0.45)]"
@@ -96,7 +74,7 @@ const Step3: React.FC<Step3Props> = ({
           <div className="flex justify-between items-center">
             <Button
               variant="outline"
-              onClick={() => window.history.back()}
+              onClick={prevStep}
               className="btn-liquid px-6 ml-3 py-5 text-sm font-bold uppercase tracking-widest text-gray-300 hover:text-white border-gray-700"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
@@ -104,7 +82,7 @@ const Step3: React.FC<Step3Props> = ({
             </Button>
             <Button
               onClick={nextStep}
-              disabled={!state.paperType}
+              disabled={!state.coneSize}
               className="btn-liquid active ml-87 px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT

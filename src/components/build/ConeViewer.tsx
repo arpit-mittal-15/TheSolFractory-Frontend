@@ -17,12 +17,13 @@ const paperColorMap: Record<PaperType, string> = {
   colored: "#F97316",
 };
 
+// Darker and more varied filter palette
 const filterColorMap: Record<FilterType, string> = {
-  standard: "#E5E7EB",
-  crutch: "#D1D5DB",
-  "branded": "#4B5563",
-  "printed-pattern": "#9CA3AF",
-  natural: "#F5F5F4",
+  standard: "#94A3B8", // slate
+  crutch: "#4B5563", // charcoal
+  branded: "#111827", // near-black
+  "printed-pattern": "#0EA5E9", // vivid cyan
+  natural: "#6B7F52", // forest/olive
 };
 
 const sizeScaleMap: Record<ConeSize, number> = {
@@ -48,37 +49,41 @@ const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
     [state.coneSize]
   );
 
-  const highlightEmissive = focusStep === "paper" ? 0.5 : 0.1;
+  const highlightEmissive = focusStep === "paper" ? 0.35 : 0.08;
 
   return (
-    <group scale={1.2}>
-      {/* Cone body */}
-      <mesh position={[0, 0.4 * sizeScale, 0]} rotation={[Math.PI, 0, 0]} castShadow>
-        <coneGeometry args={[0.3 * sizeScale, 1.4 * sizeScale, 64]} />
+    <group scale={1.15}>
+      {/* Pre-roll body: tapered tube with slight lip at the open end */}
+      <mesh position={[0, 0.28 * sizeScale, 0]} castShadow>
+        <cylinderGeometry
+          args={[0.32 * sizeScale, 0.12 * sizeScale, 1.9 * sizeScale, 80, 1, true]}
+        />
         <meshStandardMaterial
           color={paperColor}
-          roughness={0.6}
+          roughness={0.62}
           metalness={0}
           emissive={paperColor}
           emissiveIntensity={highlightEmissive}
         />
       </mesh>
 
-      {/* Filter / tip */}
-      <mesh position={[0, -0.45 * sizeScale, 0]} castShadow>
-        <cylinderGeometry args={[0.1 * sizeScale, 0.1 * sizeScale, 0.3 * sizeScale, 48]} />
+      {/* Filter / crutch */}
+      <mesh position={[0, -0.95 * sizeScale, 0]} castShadow>
+        <cylinderGeometry
+          args={[0.14 * sizeScale, 0.14 * sizeScale, 0.36 * sizeScale, 48]}
+        />
         <meshStandardMaterial
           color={filterColor}
-          roughness={0.4}
-          metalness={0.1}
+          roughness={0.32}
+          metalness={0.12}
           emissive={focusStep === "filter" ? filterColor : "#000000"}
-          emissiveIntensity={focusStep === "filter" ? 0.4 : 0.05}
+          emissiveIntensity={focusStep === "filter" ? 0.35 : 0.04}
         />
       </mesh>
 
       {/* Simple ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.7, 0]} receiveShadow>
-        <circleGeometry args={[1.2, 64]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.15, 0]} receiveShadow>
+        <circleGeometry args={[1.25, 64]} />
         <meshStandardMaterial color="#020617" roughness={0.9} />
       </mesh>
     </group>

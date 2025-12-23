@@ -26,8 +26,16 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen text-white relative">
       <Navbar />
-
       <main className="min-h-screen pt-24 md:pt-28 pb-16 relative z-10">
+      <div className="text-center mt-1">
+        <h1
+          className="text-3xl md:text-4xl font-semibold text-white mb-10 md:mb-14"
+          style={{ textShadow: "0 0 2px rgba(255,255,255,0.6)" }}
+        >
+          Contact{" "}
+          <span className="text-blue-400">Us</span>
+        </h1>
+      </div>
         <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-10 md:space-y-12 mt-[30]">
           {/* Top Section: Form + Cards */}
           {/* items-stretch makes children match height when in a row (desktop) */}
@@ -53,7 +61,7 @@ export default function ContactPage() {
                       placeholder="Full Name"
                       value={form.fullName}
                       onChange={handleChange}
-                      className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
+                      className="bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
                     />
                     <input
                       type="text"
@@ -61,7 +69,7 @@ export default function ContactPage() {
                       placeholder="Job Title"
                       value={form.jobTitle}
                       onChange={handleChange}
-                      className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
+                      className="bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
                     />
                   </div>
 
@@ -72,7 +80,7 @@ export default function ContactPage() {
                       placeholder="Work Email"
                       value={form.email}
                       onChange={handleChange}
-                      className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
+                      className="bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
                     />
                     <input
                       type="tel"
@@ -80,7 +88,7 @@ export default function ContactPage() {
                       placeholder="Phone Number"
                       value={form.phone}
                       onChange={handleChange}
-                      className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
+                      className="bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
                     />
                   </div>
 
@@ -91,7 +99,7 @@ export default function ContactPage() {
                       placeholder="Company Name"
                       value={form.company}
                       onChange={handleChange}
-                      className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
+                      className="bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
                     />
                     <input
                       type="text"
@@ -99,7 +107,7 @@ export default function ContactPage() {
                       placeholder="Website"
                       value={form.website}
                       onChange={handleChange}
-                      className="bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
+                      className="bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-xs md:text-sm text-white"
                     />
                   </div>
 
@@ -109,7 +117,7 @@ export default function ContactPage() {
                     rows={4}
                     value={form.message}
                     onChange={handleChange}
-                    className="w-full bg-black/40 border placeholder:text-white/90 border-white/10 rounded-lg px-3 py-3 text-sm text-white resize-none"
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg px-3 py-3 text-sm text-white resize-none"
                   />
 
                   {/* Button group placed at the bottom of the form container */}

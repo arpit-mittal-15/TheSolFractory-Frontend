@@ -204,7 +204,7 @@ function AnimatedImage({
       );
 
     case "marquee":
-      return <Marquee3D width={width} height={730} />;
+      return <Marquee3D />;
 
     case "lens":
       return (

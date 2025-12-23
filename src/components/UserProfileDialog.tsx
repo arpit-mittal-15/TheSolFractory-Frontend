@@ -67,7 +67,7 @@ export function UserProfileDialog() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
-        className="relative group btn-liquid active w-11 h-11 flex items-center justify-center rounded-full transition"
+        className="relative group btn-liquid active w-9.75 h-9.75 flex items-center justify-center rounded-full transition"
         aria-label="User profile"
       >
         <IconUserFilled className="w-6 h-6 text-white" />
@@ -77,7 +77,7 @@ export function UserProfileDialog() {
         <div
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className="absolute right-0 top-full mt-2 w-80 bg-black/90 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200"
+          className="dialog-card absolute right-0 w-80 border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200"
           style={{
             marginTop: "0.5rem",
           }}
