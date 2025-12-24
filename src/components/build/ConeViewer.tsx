@@ -1,8 +1,9 @@
 "use client";
 
-import React, { Suspense, useMemo } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage } from "@react-three/drei";
+import * as THREE from "three";
 import type { CustomizationState, PaperType, ConeSize, FilterType } from "./types";
 
 interface ConeViewerProps {
@@ -19,11 +20,10 @@ const paperColorMap: Record<PaperType, string> = {
 
 // Darker and more varied filter palette
 const filterColorMap: Record<FilterType, string> = {
-  standard: "#94A3B8", // slate
-  crutch: "#4B5563", // charcoal
-  branded: "#111827", // near-black
-  "printed-pattern": "#0EA5E9", // vivid cyan
-  natural: "#6B7F52", // forest/olive
+  folded: "#CBD5F5",
+  spiral: "#0EA5E9",
+  ceramic: "#E5E7EB",
+  glass: "#A5F3FC",
 };
 
 const sizeScaleMap: Record<ConeSize, number> = {
@@ -33,16 +33,79 @@ const sizeScaleMap: Record<ConeSize, number> = {
   "109mm": 1.25,
 };
 
-const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
-  const paperColor = useMemo(
-    () => paperColorMap[state.paperType ?? "hemp"],
-    [state.paperType]
-  );
+function useOptionalTexture(url?: string | null) {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
-  const filterColor = useMemo(
-    () => (state.filterType ? filterColorMap[state.filterType] : "#E5E7EB"),
-    [state.filterType]
-  );
+  useEffect(() => {
+    if (!url) {
+      setTexture((prevTex) => {
+        if (prevTex) {
+          prevTex.dispose();
+        }
+        return null;
+      });
+      return;
+    }
+
+    const loader = new THREE.TextureLoader();
+    let cancelled = false;
+
+    loader.load(
+      url,
+      (tex) => {
+        if (!cancelled) {
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1, 1);
+          tex.needsUpdate = true;
+          setTexture((prevTex) => {
+            if (prevTex) {
+              prevTex.dispose();
+            }
+            return tex;
+          });
+        }
+      },
+      undefined,
+      (error) => {
+        console.error("Failed to load texture:", error);
+        if (!cancelled) {
+          setTexture((prevTex) => {
+            if (prevTex) {
+              prevTex.dispose();
+            }
+            return null;
+          });
+        }
+      }
+    );
+
+    return () => {
+      cancelled = true;
+      setTexture((prevTex) => {
+        if (prevTex) {
+          prevTex.dispose();
+        }
+        return null;
+      });
+    };
+  }, [url]);
+
+  return texture;
+}
+
+const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
+  const paperTexture = useOptionalTexture(state.paperTextureUrl ?? null);
+  const filterTexture = useOptionalTexture(state.filterTextureUrl ?? null);
+
+  const paperColor = useMemo(() => {
+    if (state.paperColorHex) return state.paperColorHex;
+    return paperColorMap[state.paperType ?? "hemp"];
+  }, [state.paperType, state.paperColorHex]);
+
+  const filterColor = useMemo(() => {
+    if (state.filterColorHex) return state.filterColorHex;
+    return state.filterType ? filterColorMap[state.filterType] : "#E5E7EB";
+  }, [state.filterType, state.filterColorHex]);
 
   const sizeScale = useMemo(
     () => (state.coneSize ? sizeScaleMap[state.coneSize] : 1),
@@ -60,8 +123,9 @@ const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
         />
         <meshStandardMaterial
           color={paperColor}
-          roughness={0.62}
+          roughness={paperTexture ? 0.55 : 0.62}
           metalness={0}
+          map={paperTexture ?? null}
           emissive={paperColor}
           emissiveIntensity={highlightEmissive}
         />
@@ -74,25 +138,26 @@ const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
         />
         <meshStandardMaterial
           color={filterColor}
-          roughness={0.32}
+          roughness={filterTexture ? 0.28 : 0.32}
           metalness={0.12}
+          map={filterTexture ?? null}
           emissive={focusStep === "filter" ? filterColor : "#000000"}
           emissiveIntensity={focusStep === "filter" ? 0.35 : 0.04}
         />
       </mesh>
 
       {/* Simple ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.15, 0]} receiveShadow>
+      {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.15, 0]} receiveShadow>
         <circleGeometry args={[1.25, 64]} />
         <meshStandardMaterial color="#020617" roughness={0.9} />
-      </mesh>
+      </mesh> */}
     </group>
   );
 };
 
 const ConeViewer: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
   return (
-    <div className="w-full h-[320px] md:h-[420px] rounded-xl border border-blue-400/40 bg-gradient-to-b from-slate-900 via-slate-950 to-black shadow-[0_0_25px_rgba(15,23,42,0.9)] overflow-hidden">
+    <div className="w-full h-[320px] md:h-[390px] rounded-xl border border-blue-400/40 bg-gradient-to-b from-slate-900 via-slate-950 to-black shadow-[0_0_25px_rgba(15,23,42,0.9)] overflow-hidden">
       <Canvas
         shadows
         camera={{ position: [2.2, 1.4, 2.2], fov: 40 }}
@@ -124,8 +189,8 @@ const ConeViewer: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
           enablePan={false}
           enableDamping
           dampingFactor={0.12}
-          minPolarAngle={0.4}
-          maxPolarAngle={1.5}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI}
         />
       </Canvas>
     </div>

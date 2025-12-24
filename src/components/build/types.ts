@@ -4,19 +4,16 @@ import {
   Droplets,
   Infinity,
   ChevronsDown,
-  FileText,
   Sparkle,
   Flower2,
   Star,
+  PanelsTopLeft,
+  CupSoda,
+  GlassWater,
 } from "lucide-react";
 
 export type PaperType = "unbleached" | "hemp" | "bleached" | "colored";
-export type FilterType =
-  | "standard"
-  | "crutch"
-  | "branded"
-  | "printed-pattern"
-  | "natural";
+export type FilterType = "folded" | "spiral" | "ceramic" | "glass";
 export type ConeSize = "70mm" | "84mm" | "98mm" | "109mm";
 export type LotSize = "sample" | "small" | "medium" | "large" | "custom";
 
@@ -25,6 +22,10 @@ export interface CustomizationState {
   filterType: FilterType | null;
   coneSize: ConeSize | null;
   lotSize: LotSize | null;
+  paperColorHex?: string | null;
+  filterColorHex?: string | null;
+  paperTextureUrl?: string | null;
+  filterTextureUrl?: string | null;
   customQuantity: string;
   country: string;
   zipCode: string;
@@ -59,32 +60,30 @@ export const PAPER_TYPES = [
 
 export const FILTER_TYPES = [
   {
-    id: "standard" as FilterType,
-    name: "Standard Filter Tip",
+    id: "folded" as FilterType,
+    name: "Folded",
     description:
-      "A classic, simple filter for a consistent and smooth experience.",
+      "Classic folded paper tip with crisp edges and structural support.",
+    icon: PanelsTopLeft,
+  },
+  {
+    id: "spiral" as FilterType,
+    name: "Spiral",
+    description:
+      "Rolled spiral paper for a smooth draw and distinctive visual twist.",
     icon: Infinity,
   },
   {
-    id: "crutch" as FilterType,
-    name: "Crutch Filter",
-    description:
-      "Provides robust structural support and enhances airflow for a cooler draw.",
-    icon: ChevronsDown,
+    id: "ceramic" as FilterType,
+    name: "Ceramic",
+    description: "Premium ceramic-style tip with a clean, refined finish.",
+    icon: CupSoda,
   },
   {
-    id: "printed-pattern" as FilterType,
-    name: "Printed Pattern Tip",
-    description:
-      "Add unique and expressive patterns to your tips for visual flair.",
-    icon: Sparkle,
-  },
-  {
-    id: "natural" as FilterType,
-    name: "Natural / Unprinted Tip",
-    description:
-      "An eco-friendly option for a pure, unadulterated smoking experience.",
-    icon: Leaf,
+    id: "glass" as FilterType,
+    name: "Glass",
+    description: "Crystal-clear glass-inspired tip with a modern feel.",
+    icon: GlassWater,
   },
 ];
 

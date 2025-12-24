@@ -27,9 +27,13 @@ export default function BuildPage() {
   const [step, setStep] = useState(0);
   const [state, setState] = useState<CustomizationState>({
     paperType: "hemp", // Default to Hemp Paper as shown in image
-    filterType: null,
+    filterType: "folded",
     coneSize: null,
     lotSize: null,
+    paperColorHex: null,
+    filterColorHex: null,
+    paperTextureUrl: null,
+    filterTextureUrl: null,
     customQuantity: "",
     country: "",
     zipCode: "",

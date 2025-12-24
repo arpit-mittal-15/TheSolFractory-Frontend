@@ -72,4 +72,18 @@ export const AuthService = {
       method: "GET",
     });
   },
+
+  updateUser: async (userId: string, payload: Partial<User>): Promise<UserResponse> => {
+    return http<UserResponse>(`/api/auth/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  changePassword: async (userId: string, currentPassword: string, newPassword: string): Promise<{ isSuccess: boolean; message: string }> => {
+    return http<{ isSuccess: boolean; message: string }>(`/api/auth/users/${userId}/change-password`, {
+      method: "POST",
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
 };

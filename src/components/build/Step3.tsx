@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { IconTrafficCone } from "@tabler/icons-react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Header from "./Header";
-import ConeViewer from "./ConeViewer";
+import OpenConfigViewer from "./OpenConfigViewer";
 import { CONE_SIZES, type CustomizationState } from "./types";
 
 interface Step3Props {
@@ -28,12 +28,12 @@ const Step3: React.FC<Step3Props> = ({
       <Header step={step} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-7 items-start">
-        {/* Visual Preview - 3D Cone */}
+        {/* Visual Preview - Open paper + filter (not formed into a cone yet) */}
         <div className="space-y-4">
-          <ConeViewer state={state} focusStep="size" />
+          <OpenConfigViewer state={state} />
           <p className="text-xs md:text-sm text-gray-400 text-center max-w-md mx-auto">
-            Sizes change the length and proportions of your cone. Rotate to see how each
-            size feels with your current paper and filter choices.
+            View your selected paper and filter laid out flat. Changing the cone size
+            updates the proportions here before it is rolled into a cone.
           </p>
         </div>
 

@@ -11,17 +11,17 @@ interface Step0Props {
 
 const Step0: React.FC<Step0Props> = ({ step, nextStep }) => {
   return (
-    <div className="space-y-12 pt-8 pb-12">
+    <div className="space-y-1 pt-8 pb-5">
       {/* Hero heading */}
       <div className="text-center">
         <h1
-          className="text-3xl md:text-4xl font-semibold text-white mb-3 md:mb-4"
+          className="text-3xl md:text-3xl font-semibold text-white mb-3 md:mb-3"
           style={{ textShadow: "0 0 1px rgba(255,255,255,0.6)" }}
         >
           Create your cone exactly the way you{" "}
           <span className="text-blue-400">want it.</span>
         </h1>
-        <p className="text-gray-300 text-center mb-4 md:mb-6 max-w-[620px] mx-auto md:text-base leading-relaxed">
+        <p className="text-gray-300 text-center mb-0 md:mb-0 max-w-[600px] mx-auto md:text-[15px] leading-relaxed">
           Dive into a world of endless possibilities. Select the perfect paper
           for your custom cones and begin crafting your unique smoking
           experience.
@@ -29,7 +29,7 @@ const Step0: React.FC<Step0Props> = ({ step, nextStep }) => {
       </div>
 
       {/* Step indicator row */}
-      <Header step={step} />
+      <Header step={step} mb={7} mt={6} />
 
       {/* Four step preview cards with supplied images */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto mt-4 items-stretch">
@@ -41,7 +41,7 @@ const Step0: React.FC<Step0Props> = ({ step, nextStep }) => {
         ].map((card) => (
           <div
             key={card.src}
-            className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl h-full min-h-[210px] flex flex-col overflow-hidden shadow-[0_0_18px_rgba(59,130,246,0.15)]"
+            className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl h-[80px] min-h-[210px] flex flex-col overflow-hidden shadow-[0_0_18px_rgba(59,130,246,0.15)]"
           >
             <div className="relative w-full h-28">
               <Image
@@ -64,10 +64,10 @@ const Step0: React.FC<Step0Props> = ({ step, nextStep }) => {
       </div>
 
       {/* CTA */}
-      <div className="flex justify-center pt-6">
+      <div className="flex justify-center pt-4">
         <Button
           onClick={nextStep}
-          className="btn-liquid active px-10 py-7 text-xs md:text-[12px] font-bold uppercase tracking-[0.25em] text-white rounded-full border border-blue-500 bg-blue-600/80 hover:bg-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.7)]"
+          className="btn-liquid w-72 active px-10 py-5 text-xs md:text-[10px] font-bold uppercase tracking-[0.25em] text-white rounded-full border border-blue-500 bg-blue-600/80 hover:bg-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.7)]"
         >
           START TO BUILD YOUR CONE
           <ArrowRight className="ml-2 h-4 w-4" />

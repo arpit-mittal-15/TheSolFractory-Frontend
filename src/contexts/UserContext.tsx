@@ -8,6 +8,7 @@ export interface User {
   email: string;
   name: string;
   phoneNumber: string;
+  address?: string;
 }
 
 interface UserContextType {

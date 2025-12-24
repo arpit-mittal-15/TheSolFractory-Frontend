@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, ArrowLeft, ArrowRight } from "lucide-react";
+import { Check, ArrowLeft, ArrowRight, Palette, Image as ImageIcon } from "lucide-react";
 import { FILTER_TYPES, type CustomizationState } from "./types";
 import Header from "./Header";
-import ConeViewer from "./ConeViewer";
+import FilterViewer from "./FilterViewer";
 
 interface Step2Props {
   step: number;
@@ -20,6 +20,26 @@ const Step2: React.FC<Step2Props> = ({
   prevStep,
   nextStep,
 }) => {
+  const colorInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateState({ filterColorHex: event.target.value });
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        updateState({ filterTextureUrl: reader.result });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="space-y-8">
 
@@ -27,12 +47,50 @@ const Step2: React.FC<Step2Props> = ({
       <Header step={step} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-7 items-start">
-        {/* Visual Preview - 3D Cone */}
+        {/* Visual Preview - 3D Filter Paper */}
         <div className="space-y-4">
-          <ConeViewer state={state} focusStep="filter" />
+          <div className="relative">
+            <FilterViewer
+              filterType={state.filterType}
+              filterColorHex={state.filterColorHex}
+              filterTextureUrl={state.filterTextureUrl}
+              coneSize={state.coneSize}
+            />
+            {/* Color + upload controls */}
+            <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+              <button
+                type="button"
+                onClick={() => colorInputRef.current?.click()}
+                className="w-9 h-9 rounded-full bg-black/60 border border-white/20 flex items-center justify-center hover:border-blue-400 hover:bg-blue-500/40 transition"
+              >
+                <Palette className="w-4 h-4 text-white" />
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-9 h-9 rounded-full bg-black/60 border border-white/20 flex items-center justify-center hover:border-blue-400 hover:bg-blue-500/40 transition"
+              >
+                <ImageIcon className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            <input
+              ref={colorInputRef}
+              type="color"
+              className="hidden"
+              value={state.filterColorHex || "#ffffff"}
+              onChange={handleColorChange}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
           <p className="text-xs md:text-sm text-gray-400 text-center max-w-md mx-auto">
-            Filters update the tip of your cone. Rotate the model and select different
-            filters to see how they change the look.
+            Watch your filter paper animate as you switch between Folded, Spiral,
+            Ceramic, and Glass styles. Rotate to inspect every detail.
           </p>
         </div>
 
