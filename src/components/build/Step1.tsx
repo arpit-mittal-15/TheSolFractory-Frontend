@@ -44,7 +44,22 @@ const Step1: React.FC<Step1Props> = ({
     <div className="space-y-8">
 
       {/* Step indicator directly under heading */}
-      <Header step={step} mt={10} mb={10} />
+      {/* <Header step={step} /> */}
+
+      <div className="mt-11 mb-10 flex justify-center items-center">
+        <div className="flex flex-col items-start bg-blue-900/40 border-2 border-blue-400 rounded-4xl px-6 py-3 max-w-md w-[90%] shadow-2xl">
+          <div className="flex items-center space-x-2 mb-1">
+            <Palette className="text-white w-4.5 h-4.5" />
+            <h3 className="text-white font-semibold text-lg">
+              Select your Paper type.
+            </h3>
+          </div>
+          <p className="text-gray-300 text-[12px] w-full truncate whitespace-nowrap overflow-hidden">
+            Choose ideal paper option for your perfect cone from the gallery below.
+          </p>
+        </div>
+      </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Panel: 3D Paper Viewer */}
@@ -99,15 +114,24 @@ const Step1: React.FC<Step1Props> = ({
         </div>
 
         {/* Right Panel: Selection Buttons */}
-        <div className="grid h-100 grid-cols-2 mt-1 gap-4">
+        <div className="grid h-100 grid-cols-2 gap-4">
+
+          {/* Available Options heading */}
+          <div className="col-span-2  mb-0.5">
+            <h4 className="text-sm text-gray-300 font-medium tracking-wide">
+              Available Options
+            </h4>
+            <div className="h-px w-36 bg-gradient-to-r from-gray-400/40 to-transparent" />
+          </div>
+
+          {/* Cards */}
           {PAPER_TYPES.map((paper) => {
-            const Icon = paper.icon;
             const isSelected = state.paperType === paper.id;
             return (
               <button
                 key={paper.id}
                 onClick={() => updateState({ paperType: paper.id })}
-                className={`relative rounded-lg p-[16px] border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
+                className={`relative rounded-lg p-2.5 border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
                   isSelected
                     ? "active border-blue-400 shadow-[0_0_18px_rgba(59,130,246,0.45)]"
                     : "border-gray-700 hover:border-gray-600"
@@ -122,12 +146,6 @@ const Step1: React.FC<Step1Props> = ({
                   </div>
                 )}
                 <div className="flex flex-col items-center space-y-4">
-                  <Icon
-                    className={`h-12 w-12 ${
-                      isSelected ? "text-blue-400" : "text-white"
-                    }`}
-                    strokeWidth={1.5}
-                  />
                   <div className="text-center">
                     <h3
                       className={`font-semibold text-base mb-2 ${
@@ -136,9 +154,9 @@ const Step1: React.FC<Step1Props> = ({
                     >
                       {paper.name}
                     </h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">
-                      {paper.description}
-                    </p>
+                      <p className="text-gray-400 text-center mx-auto max-w-[75%] text-xs leading-relaxed">
+                        {paper.description}
+                      </p>
                   </div>
                 </div>
               </button>

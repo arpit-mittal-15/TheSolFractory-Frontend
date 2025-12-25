@@ -36,25 +36,21 @@ export const PAPER_TYPES = [
     id: "unbleached" as PaperType,
     name: "Unbleached (Brown)",
     description: "Natural and organic, for a pure experience.",
-    icon: Leaf,
   },
   {
     id: "hemp" as PaperType,
     name: "Hemp Paper",
     description: "Sustainable choice, with a unique texture.",
-    icon: Flower2,
   },
   {
     id: "bleached" as PaperType,
     name: "Bleached (White)",
     description: "Clean and classic, for a smooth burn.",
-    icon: Droplets,
   },
   {
     id: "colored" as PaperType,
     name: "Colored Paper",
     description: "Natural and organic, for a pure experience.",
-    icon: Star,
   },
 ];
 

@@ -2,30 +2,18 @@ import React from "react";
 
 interface HeaderProps {
   step: number;
-  mb?: number;
-  mt?: number;
 }
 
-const Header: React.FC<HeaderProps> = ({ step, mb = 0, mt = 0 }) => {
+const Header: React.FC<HeaderProps> = ({ step }) => {
   return (
-    <div className={`flex justify-center mb-${mb} mt-${mt}`}>
-      <div className="flex items-center max-w-5xl w-[85%] px-4">
-        {/* Step 1 */}
-        <StepCircle active stepNum={1} />
-
+    <div className="flex justify-center mt-6 mb-6">
+      <div className="flex items-center max-w-4xl w-full px-4">
+        <StepCircle active={step >= 1} stepNum={1} />
         <Connector active={step >= 2} />
-
-        {/* Step 2 */}
         <StepCircle active={step >= 2} stepNum={2} />
-
         <Connector active={step >= 3} />
-
-        {/* Step 3 */}
         <StepCircle active={step >= 3} stepNum={3} />
-
         <Connector active={step >= 4} />
-
-        {/* Step 4 */}
         <StepCircle active={step >= 4} stepNum={4} />
       </div>
     </div>
@@ -43,12 +31,12 @@ const StepCircle = ({
   active: boolean;
   stepNum: number;
 }) => (
-  <div className="relative z-10 flex-shrink-0">
+  <div className="shrink-0 mr-2 ml-2 flex items-start justify-center">
     <div
-      className={`w-9 h-9 ml-4 mr-4 rounded-full border-2 flex items-center justify-center transition-all
+      className={`w-9 h-9 rounded-full border-2 flex items-center justify-center
         ${
           active
-            ? "bg-blue-700 border-blue-700 text-white"
+            ? ""
             : "bg-white border-white/80 text-black/80"
         }`}
     >
@@ -59,7 +47,7 @@ const StepCircle = ({
 
 const Connector = ({ active }: { active: boolean }) => (
   <div
-    className={`h-[2px] flex-1 -mx-1 transition-all ${
+    className={`h-[2px] flex-1 mx-[1px] ${
       active ? "bg-blue-700" : "bg-white/80"
     }`}
   />

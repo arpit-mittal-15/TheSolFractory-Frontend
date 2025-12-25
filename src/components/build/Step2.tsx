@@ -44,7 +44,20 @@ const Step2: React.FC<Step2Props> = ({
     <div className="space-y-8">
 
       {/* Step indicator */}
-      <Header step={step} />
+      {/* <Header step={step} /> */}
+      <div className="mt-11 mb-10 flex justify-center items-center">
+        <div className="flex flex-col items-start bg-blue-900/40 border-2 border-blue-400 rounded-4xl px-6 py-3 max-w-md w-[90%] shadow-2xl">
+          <div className="flex items-center space-x-2 mb-1">
+            <Palette className="text-white w-4.5 h-4.5" />
+            <h3 className="text-white font-semibold text-lg">
+              Select your Filter type.
+            </h3>
+          </div>
+          <p className="text-gray-300 text-[12px] w-full truncate whitespace-nowrap overflow-hidden">
+            Choose ideal paper option for your perfect cone from the gallery below.
+          </p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-7 items-start">
         {/* Visual Preview - 3D Filter Paper */}
@@ -97,16 +110,17 @@ const Step2: React.FC<Step2Props> = ({
               key={state.filterTextureUrl ? "has-texture" : "no-texture"}
             />
           </div>
-          <p className="text-xs md:text-sm text-gray-400 text-center max-w-md mx-auto">
-            Watch your filter paper animate as you switch between Folded, Spiral,
-            Ceramic, and Glass styles. Rotate to inspect every detail.
-          </p>
         </div>
 
         {/* Filter Options */}
         <div className="grid grid-cols-2 h-91 gap-5 w-xl lg:ml-auto">
+          <div className="col-span-2  mb-0.5">
+            <h4 className="text-sm text-gray-300 font-medium tracking-wide">
+              Available Options
+            </h4>
+            <div className="h-px w-36 bg-gradient-to-r from-gray-400/40 to-transparent" />
+          </div>
           {FILTER_TYPES.map((filter) => {
-            const Icon = filter.icon;
             const isSelected = state.filterType === filter.id;
             return (
               <button
@@ -124,7 +138,6 @@ const Step2: React.FC<Step2Props> = ({
                   </div>
                 )}
                 <div className="flex items-start space-x-3">
-                  <Icon className="h-7 w-7 text-white flex-shrink-0 mt-1" />
                   <div className="space-y-1">
                     <h3 className="text-white font-semibold text-sm md:text-base">
                       {filter.name}

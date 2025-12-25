@@ -188,7 +188,7 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
         })}
 
           {/* Zig-zag strips running across the hollow inner gap of the roll */}
-          {Array.from({ length: 6 }).map((_, i) => {
+          {Array.from({ length: 3 }).map((_, i) => {
             const ratio = i / 5;
             const angle = ratio * Math.PI * 2 + Math.PI * 0.4 * foldProgress;
             const innerR = 0.06; // well inside hollow core (roll starts around 0.22)
@@ -205,7 +205,7 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
                 rotation={[-Math.PI / 2.1, angle + tilt * 0.2, 0]}
               >
                 {/* Small strip so it clearly stays inside hole */}
-                <planeGeometry args={[0.16, 0.06, 6, 1]} />
+                <planeGeometry args={[0.76, 0.26, 6, 8]} />
                 {commonMaterial}
               </mesh>
             );
@@ -219,8 +219,8 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
           <mesh>
             <cylinderGeometry
               args={[
-                0.28 * foldProgress,
-                0.28 * foldProgress,
+                0.28 * foldProgress, // top radious
+                0.12 * foldProgress, // bottom radius
                 0.9,
                 64,
                 1,
@@ -259,7 +259,7 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
         <group>
           {/* Glass filter */}
           <mesh rotation={[-Math.PI / 2.2, 0, 0]}>
-            <cylinderGeometry args={[0.22 * foldProgress, 0.12 * foldProgress, 0.85, 64, 1, true]} />
+            <cylinderGeometry args={[0.26 * foldProgress, 0.14 * foldProgress, 0.85, 64, 1, true]} />
             {commonMaterial}
           </mesh>
         </group>
