@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Palette } from "lucide-react";
 import Header from "./Header";
 import OpenConfigViewer from "./OpenConfigViewer";
 import { CONE_SIZES, type CustomizationState } from "./types";
+import StepIndicator from "./StepIndicator";
 
 interface Step3Props {
   step: number;
@@ -43,7 +44,10 @@ const Step3: React.FC<Step3Props> = ({
       <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-7 items-start">
         {/* Visual Preview - Open paper + filter (not formed into a cone yet) */}
         <div className="space-y-4">
-          <OpenConfigViewer state={state} />
+          <div className="relative">
+            <StepIndicator currentStep={3} />
+            <OpenConfigViewer state={state} />
+          </div>
         </div>
 
         {/* Size Options */}
@@ -86,19 +90,19 @@ const Step3: React.FC<Step3Props> = ({
             );
           })}
           {/* Navigation */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-3">
             <Button
               variant="outline"
               onClick={prevStep}
-              className="btn-liquid px-6 ml-3 py-5 text-sm font-bold uppercase tracking-widest text-gray-300 hover:text-white border-gray-700"
+              className="btn-glass-panel ml-3 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
-              BACK
+              Previous
             </Button>
             <Button
               onClick={nextStep}
-              disabled={!state.coneSize}
-              className="btn-liquid active ml-87 px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!state.paperType}
+              className="btn-glass-panel ml-75 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT
               <ArrowRight className="ml-1 h-4 w-4" />

@@ -121,7 +121,7 @@ const AnimatedPaper: React.FC<PaperViewerProps> = ({
   return (
     <group ref={groupRef}>
       <mesh ref={paperRef} rotation={[-Math.PI / 2.2, 0, 0]}>
-        <planeGeometry args={[2.6, 2.6, 48, 6]} />
+        <planeGeometry args={[2.6, 2.6, 4, 6]} />
         <meshStandardMaterial
           key={paperTextureUrl || baseColor}
           color={baseColor}

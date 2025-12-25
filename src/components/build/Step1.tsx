@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Palette, Image as ImageIcon } from "lucid
 import { PAPER_TYPES, type CustomizationState } from "./types";
 import Header from "./Header";
 import PaperViewer from "./PaperViewer";
+import StepIndicator from "./StepIndicator";
 
 interface Step1Props {
   step: number;
@@ -65,13 +66,14 @@ const Step1: React.FC<Step1Props> = ({
         {/* Left Panel: 3D Paper Viewer */}
         <div className="flex flex-col space-y-4">
           <div className="relative">
+            <StepIndicator currentStep={1} />
             <PaperViewer
               paperType={state.paperType}
               paperColorHex={state.paperColorHex}
               paperTextureUrl={state.paperTextureUrl}
             />
             {/* Color + upload controls */}
-            <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+            <div className="absolute top-0 right-3 flex items-center gap-2 z-10">
               <button
                 type="button"
                 onClick={() => colorInputRef.current?.click()}

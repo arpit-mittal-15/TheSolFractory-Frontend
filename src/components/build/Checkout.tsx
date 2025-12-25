@@ -68,12 +68,13 @@ const Checkout: React.FC<CheckoutProps> = ({
                 value={state.country}
                 onValueChange={(value) => updateState({ country: value })}
               >
-                <SelectTrigger className="bg-[#0b101b] rounded-3xl border-[#2a3a53] text-white h-10 text-sm">
-                  <SelectValue placeholder="SELECT A COUNTRY" />
+                <SelectTrigger className="bg-[#0b101b] rounded-3xl border-[#2a3a53] text-gray-500 h-10 text-[12px]">
+                  <SelectValue placeholder="Select your Country" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-900 border-gray-700">
                   <SelectItem value="us">United States</SelectItem>
                   <SelectItem value="ca">Canada</SelectItem>
+                  <SelectItem value="in">India</SelectItem>
                   <SelectItem value="uk">United Kingdom</SelectItem>
                   <SelectItem value="au">Australia</SelectItem>
                 </SelectContent>
@@ -150,17 +151,17 @@ const Checkout: React.FC<CheckoutProps> = ({
           </div>
           <div className="flex justify-end pt-2 gap-15 mt-5">
             <Button
-              onClick={handleAddToCart}
-              className="btn-liquid active px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
-            >
-              Place Your Order
-            </Button>
-            <Button
               variant="outline"
               onClick={prevStep}
               className="btn-liquid px-6 py-5 mr-1 text-xs font-semibold uppercase tracking-[0.15em] text-white border-white/30 bg-transparent hover:bg-white/10"
             >
               Back to Build Cone
+            </Button>
+            <Button
+              onClick={handleAddToCart}
+              className="btn-liquid active px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+            >
+              Place Your Order
             </Button>
           </div>
         </div>

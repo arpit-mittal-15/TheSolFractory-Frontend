@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, Palette } from "lucide-react";
 import Header from "./Header";
 import ConeViewer from "./ConeViewer";
+import StepIndicator from "./StepIndicator";
 import {
   LOT_SIZES,
   type CustomizationState,
@@ -47,7 +48,10 @@ const Step4: React.FC<Step4Props> = ({
       <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-7 items-start">
         {/* Visual Preview - Full Cone */}
         <div className="space-y-4">
-          <ConeViewer state={state} focusStep="lot" />
+          <div className="relative">
+            <StepIndicator currentStep={4} />
+            <ConeViewer state={state} focusStep="lot" />
+          </div>
         </div>
 
         {/* Lot Size Options & Your Selection */}
@@ -90,19 +94,19 @@ const Step4: React.FC<Step4Props> = ({
             );
           })}
           {/* Navigation */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-3">
             <Button
               variant="outline"
               onClick={prevStep}
-              className="btn-liquid px-6 ml-3 py-5 text-sm font-bold uppercase tracking-widest text-gray-300 hover:text-white border-gray-700"
+              className="btn-glass-panel ml-3 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
-              BACK
+              Previous
             </Button>
             <Button
               onClick={nextStep}
-              disabled={!state.lotSize}
-              className="btn-liquid active ml-87 px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!state.paperType}
+              className="btn-glass-panel ml-75 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT
               <ArrowRight className="ml-1 h-4 w-4" />
@@ -115,5 +119,3 @@ const Step4: React.FC<Step4Props> = ({
 };
 
 export default Step4;
-
-

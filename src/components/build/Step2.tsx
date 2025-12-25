@@ -4,6 +4,7 @@ import { Check, ArrowLeft, ArrowRight, Palette, Image as ImageIcon } from "lucid
 import { FILTER_TYPES, type CustomizationState } from "./types";
 import Header from "./Header";
 import FilterViewer from "./FilterViewer";
+import StepIndicator from "./StepIndicator";
 
 interface Step2Props {
   step: number;
@@ -63,6 +64,7 @@ const Step2: React.FC<Step2Props> = ({
         {/* Visual Preview - 3D Filter Paper */}
         <div className="space-y-4">
           <div className="relative">
+            <StepIndicator currentStep={2} />
             <FilterViewer
               filterType={state.filterType}
               filterColorHex={state.filterColorHex}
@@ -70,7 +72,7 @@ const Step2: React.FC<Step2Props> = ({
               coneSize={state.coneSize}
             />
             {/* Color + upload controls */}
-            <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+            <div className="absolute top-0 right-3 flex items-center gap-2 z-10">
               <button
                 type="button"
                 onClick={() => colorInputRef.current?.click()}
@@ -150,20 +152,19 @@ const Step2: React.FC<Step2Props> = ({
               </button>
             );
           })}
-          {/* Navigation */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-3">
             <Button
               variant="outline"
               onClick={prevStep}
-              className="btn-liquid px-6 ml-3 py-5 text-sm font-bold uppercase tracking-widest text-gray-300 hover:text-white border-gray-700"
+              className="btn-glass-panel ml-3 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
-              BACK
+              Previous
             </Button>
             <Button
               onClick={nextStep}
-              disabled={!state.filterType}
-              className="btn-liquid active ml-87 px-6 py-5 text-sm font-bold uppercase tracking-widest text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!state.paperType}
+              className="btn-glass-panel ml-75 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT
               <ArrowRight className="ml-1 h-4 w-4" />
@@ -176,5 +177,3 @@ const Step2: React.FC<Step2Props> = ({
 };
 
 export default Step2;
-
-
