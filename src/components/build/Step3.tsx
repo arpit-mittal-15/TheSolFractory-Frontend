@@ -14,6 +14,8 @@ interface Step3Props {
   nextStep: () => void;
 }
 
+const TOTAL_CARDS = 6;
+
 const Step3: React.FC<Step3Props> = ({
   step,
   state,
@@ -21,20 +23,9 @@ const Step3: React.FC<Step3Props> = ({
   prevStep,
   nextStep,
 }) => {
-  // Ensure exactly 6 cards are rendered (use real sizes first, pad with placeholders if needed)
-  const displayedSizes: Array<any> = (() => {
-    const arr = [...CONE_SIZES];
-    let idx = 0;
-    while (arr.length < 6) {
-      arr.push({
-        id: `placeholder-${idx}`,
-        name: `Size ${arr.length + 1}`,
-        description: "",
-      });
-      idx++;
-    }
-    return arr.slice(0, 6);
-  })();
+  // Use only the real CONE_SIZES values; do not fabricate ids.
+  const realSizes = CONE_SIZES.slice(0, TOTAL_CARDS);
+  const emptySlots = Math.max(0, TOTAL_CARDS - realSizes.length);
 
   return (
     <div className="space-y-8">
@@ -75,7 +66,7 @@ const Step3: React.FC<Step3Props> = ({
             <div className="h-px w-36 bg-gradient-to-r from-gray-400/40 to-transparent" />
           </div>
 
-          {displayedSizes.map((size: any) => {
+          {realSizes.map((size) => {
             const isSelected = state.coneSize === size.id;
             return (
               <button
@@ -86,6 +77,7 @@ const Step3: React.FC<Step3Props> = ({
                     ? "active border-blue-400 shadow-[0_0_18px_rgba(59,130,246,0.45)]"
                     : "border-gray-700 hover:border-gray-600"
                 }`}
+                type="button"
               >
                 {isSelected && (
                   <div className="absolute top-3 right-3 w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
@@ -97,8 +89,7 @@ const Step3: React.FC<Step3Props> = ({
                 )}
 
                 <div className="flex flex-col items-center space-y-3 h-full justify-center">
-
-                  <div className={`text-center`}>
+                  <div className="text-center">
                     <div
                       className={`text-white font-semibold text-base mb-1 ${
                         isSelected ? "text-white" : "text-gray-300"
@@ -114,6 +105,15 @@ const Step3: React.FC<Step3Props> = ({
               </button>
             );
           })}
+
+          {/* Empty visual-only cards to make total = 6 (no fake ids or state updates) */}
+          {Array.from({ length: emptySlots }).map((_, i) => (
+            <div
+              key={`empty-${i}`}
+              aria-hidden
+              className="h-[115px] rounded-lg p-2.5 border border-dashed border-gray-700 bg-black/20 backdrop-blur-xl opacity-40 pointer-events-none"
+            />
+          ))}
 
           {/* Divider + Buttons (same as Step1) */}
           <div className="col-span-2 mt-1">

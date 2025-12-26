@@ -5,7 +5,6 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage } from "@react-three/drei";
 import * as THREE from "three";
 import type { CustomizationState, PaperType, ConeSize, FilterType } from "./types";
-import { CONE_DIMENSIONS } from "./types";
 
 // Add this import at the top of ConeViewer.tsx
 import { getProceduralTexture } from "./PaperViewer";

@@ -17,7 +17,7 @@ import {
 export type PaperType = "unbleached" | "hemp" | "bleached" | "colored" | "rice" | "bamboo";
 export type FilterType = "folded" | "spiral" | "ceramic" | "glass" | "wooden" | "ball";
 export type ConeSize = "70mm" | "84mm" | "98mm" | "109mm";
-export type LotSize = "sample" | "small" | "medium" | "large" | "custom";
+export type LotSize = "sample" | "small" | "medium" | "large" |"mega" |"bulk" | "custom";
 
 export interface CustomizationState {
   paperType: PaperType | null;
@@ -108,12 +108,12 @@ export const FILTER_TYPES = [
 ];
 
 // Cone dimensions in mm (from image reference)
-// export const CONE_DIMENSIONS: Record<ConeSize, { topDiameter: number; bottomDiameter: number; height: number }> = {
-//   "70mm": { topDiameter: 9.9, bottomDiameter: 5.5, height: 70 },
-//   "84mm": { topDiameter: 10.8, bottomDiameter: 5.5, height: 84 },
-//   "98mm": { topDiameter: 11.7, bottomDiameter: 5.5, height: 98 },
-//   "109mm": { topDiameter: 12.4, bottomDiameter: 5.5, height: 109 },
-// };
+export const CONE_DIMENSIONS: Record<ConeSize, { topDiameter: number; bottomDiameter: number; height: number }> = {
+  "70mm": { topDiameter: 9.9, bottomDiameter: 5.5, height: 70 },
+  "84mm": { topDiameter: 10.8, bottomDiameter: 5.5, height: 84 },
+  "98mm": { topDiameter: 11.7, bottomDiameter: 5.5, height: 98 },
+  "109mm": { topDiameter: 12.4, bottomDiameter: 5.5, height: 109 },
+};
 
 export const CONE_SIZES = [
   {
@@ -133,6 +133,16 @@ export const CONE_SIZES = [
   },
   {
     id: "109mm" as ConeSize,
+    name: "109mm",
+    description: "King Size 1 Gram",
+  },
+  {
+    id: "100mm" as ConeSize,
+    name: "98mm",
+    description: "Standard / 3/4 Gram",
+  },
+  {
+    id: "119mm" as ConeSize,
     name: "109mm",
     description: "King Size 1 Gram",
   },
@@ -168,14 +178,14 @@ export const LOT_SIZES = [
     price: "$0.40 - $0.75 per cone",
   },
   {
-    id: "sample7" as LotSize,
+    id: "Mega" as LotSize,
     name: "Sample Batch",
     quantity: "50-200 cones",
     leadTime: "5-7 Business Days",
     price: "$0.40 - $0.75 per cone",
   },
   {
-    id: "small1" as LotSize,
+    id: "Bulk" as LotSize,
     name: "Small Batch",
     quantity: "3,000-10,000 cones",
     leadTime: "5-7 Business Days",
