@@ -108,12 +108,12 @@ export const FILTER_TYPES = [
 ];
 
 // Cone dimensions in mm (from image reference)
-export const CONE_DIMENSIONS: Record<ConeSize, { topDiameter: number; bottomDiameter: number; height: number }> = {
-  "70mm": { topDiameter: 9.9, bottomDiameter: 5.5, height: 70 },
-  "84mm": { topDiameter: 10.8, bottomDiameter: 5.5, height: 84 },
-  "98mm": { topDiameter: 11.7, bottomDiameter: 5.5, height: 98 },
-  "109mm": { topDiameter: 12.4, bottomDiameter: 5.5, height: 109 },
-};
+// export const CONE_DIMENSIONS: Record<ConeSize, { topDiameter: number; bottomDiameter: number; height: number }> = {
+//   "70mm": { topDiameter: 9.9, bottomDiameter: 5.5, height: 70 },
+//   "84mm": { topDiameter: 10.8, bottomDiameter: 5.5, height: 84 },
+//   "98mm": { topDiameter: 11.7, bottomDiameter: 5.5, height: 98 },
+//   "109mm": { topDiameter: 12.4, bottomDiameter: 5.5, height: 109 },
+// };
 
 export const CONE_SIZES = [
   {

@@ -6,8 +6,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ step }) => {
   return (
-    <div className="flex justify-center mt-6 mb-6">
-      <div className="flex items-center max-w-4xl w-full px-4">
+    <div className="flex justify-center">
+      <div className="flex items-center w-full max-w-[900px]">
         <StepCircle active={step >= 1} stepNum={1} />
         <Connector active={step >= 2} />
         <StepCircle active={step >= 2} stepNum={2} />
@@ -31,14 +31,10 @@ const StepCircle = ({
   active: boolean;
   stepNum: number;
 }) => (
-  <div className="shrink-0 mr-2 ml-2 flex items-start justify-center">
+  <div className="shrink-0 flex items-center justify-center">
     <div
-      className={`w-9 h-9 rounded-full border-2 flex items-center justify-center
-        ${
-          active
-            ? ""
-            : "bg-white border-white/80 text-black/80"
-        }`}
+      className={`w-9 h-9 rounded-full border-2 flex items-center justify-center bg-white
+        ${active ? "border-blue-600 text-blue-600" : "border-gray-300 text-black"}`}
     >
       <span className="text-sm font-bold">{stepNum}</span>
     </div>
@@ -47,8 +43,8 @@ const StepCircle = ({
 
 const Connector = ({ active }: { active: boolean }) => (
   <div
-    className={`h-[2px] flex-1 mx-[1px] ${
-      active ? "bg-blue-700" : "bg-white/80"
+    className={`flex-1 h-[2px] mx-2 ${
+      active ? "bg-blue-600" : "bg-gray-300"
     }`}
   />
 );

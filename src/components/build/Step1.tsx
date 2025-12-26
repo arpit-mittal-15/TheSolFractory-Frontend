@@ -79,7 +79,7 @@ const Step1: React.FC<Step1Props> = ({
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
         {/* Left Panel: 3D Paper Viewer */}
         <div className="flex flex-col space-y-4">
           <div className="relative">
@@ -140,11 +140,12 @@ const Step1: React.FC<Step1Props> = ({
         </div>
 
         {/* Right Panel: Selection Buttons */}
-        <div className="grid h-100 grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 min-h-[16vh] content-start">
+
 
           {/* Available Options heading */}
           <div className="col-span-2  mb-0.5">
-            <h4 className="text-sm text-gray-300 font-medium tracking-wide">
+            <h4 className="text-[110%] text-gray-300 font-medium tracking-wide">
               Available Options
             </h4>
             <div className="h-px w-36 bg-gradient-to-r from-gray-400/40 to-transparent" />
@@ -157,7 +158,7 @@ const Step1: React.FC<Step1Props> = ({
               <button
                 key={paper.id}
                 onClick={() => updateState({ paperType: paper.id })}
-                className={`relative rounded-lg p-2.5 border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
+                className={`relative h-[115px] rounded-lg p-2.5 border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
                   isSelected
                     ? "active border-blue-400 shadow-[0_0_18px_rgba(59,130,246,0.45)]"
                     : "border-gray-700 hover:border-gray-600"
@@ -188,24 +189,33 @@ const Step1: React.FC<Step1Props> = ({
               </button>
             );
           })}
-          <div className="flex justify-between items-center mt-3">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              className="btn-glass-panel ml-3 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={!state.paperType || isTransitioning}
-              className="btn-glass-panel ml-75 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              NEXT
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
+          {/* Divider + Buttons */}
+          <div className="col-span-2 mt-1">
+            {/* Horizontal line */}
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-500/40 to-transparent mb-2" />
+
+            {/* Buttons */}
+            <div className="flex justify-between items-center">
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                className="btn-glass-panel ml-[2%] cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ArrowLeft className="mr-1 h-4 w-4" />
+                Previous
+              </Button>
+
+              <Button
+                onClick={handleNext}
+                disabled={!state.paperType || isTransitioning}
+                className="btn-glass-panel ml-[2%] not-md:ml-[10%] cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                NEXT
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
