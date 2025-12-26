@@ -10,10 +10,12 @@ import {
   PanelsTopLeft,
   CupSoda,
   GlassWater,
+  TreePine,
+  Circle,
 } from "lucide-react";
 
 export type PaperType = "unbleached" | "hemp" | "bleached" | "colored" | "rice" | "bamboo";
-export type FilterType = "folded" | "spiral" | "ceramic" | "glass";
+export type FilterType = "folded" | "spiral" | "ceramic" | "glass" | "wooden" | "ball";
 export type ConeSize = "70mm" | "84mm" | "98mm" | "109mm";
 export type LotSize = "sample" | "small" | "medium" | "large" | "custom";
 
@@ -90,6 +92,18 @@ export const FILTER_TYPES = [
     name: "Glass",
     description: "Crystal-clear glass-inspired tip with a modern feel.",
     icon: GlassWater,
+  },
+  {
+    id: "wooden" as FilterType,
+    name: "Wooden",
+    description: "Natural wooden filter with authentic wood grain texture.",
+    icon: TreePine,
+  },
+  {
+    id: "ball" as FilterType,
+    name: "Ball",
+    description: "Cylindrical filter with decorative ball on top.",
+    icon: Circle,
   },
 ];
 

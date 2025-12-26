@@ -19,7 +19,7 @@ const defaultPaperColors: Record<PaperType, string> = {
   unbleached: "#8B6F47",
   hemp: "#9FAF8A",
   bleached: "#F9FAFB",
-  colored: "#F97316",
+  colored: "#690c0f",
   rice: "#F5F5F0",
   bamboo: "#D4C4A8",
 };
@@ -204,6 +204,8 @@ const AnimatedPaper: React.FC<PaperViewerProps> = ({
     return paperColorHex || defaultPaperColors[effectiveType];
   }, [paperType, paperColorHex]);
 
+  const effectiveTextureOrNull = paperColorHex ? null : effectiveTexture;
+
   const materialProps = useMemo(() => {
     const effectiveType = paperType ?? "hemp";
     switch (effectiveType) {
@@ -276,8 +278,9 @@ const AnimatedPaper: React.FC<PaperViewerProps> = ({
         paperRef.current.rotation.z = easeOut * Math.PI * 2;
         
         // Move to bottom-left square position (inside canvas)
-        const xPos = -0.6 * easeOut; // Bottom-left square position
-        const yPos = -1.2 * easeOut; // Lower position
+        // Position matches bottom-left preview square (left-1/6 = ~16.67% from left)
+        const xPos = -1.8 * easeOut; // Bottom-left square position
+        const yPos = -1.5 * easeOut; // Lower position
         paperRef.current.position.set(xPos, yPos, 0);
       } else {
         paperRef.current.scale.y = scaleY;
@@ -300,7 +303,8 @@ const AnimatedPaper: React.FC<PaperViewerProps> = ({
             color={baseColor}
             roughness={materialProps.roughness}
             metalness={materialProps.metalness}
-            map={effectiveTexture}
+            // map={effectiveTexture}
+            map={effectiveTextureOrNull} // use the new variable here
             transparent={paperType === "rice"}
             opacity={paperType === "rice" ? 0.85 : 1}
             side={THREE.DoubleSide}
@@ -334,7 +338,7 @@ const PaperViewer: React.FC<PaperViewerProps> = (props) => {
         camera={{ position: [0.8, 0.8, 3], fov: 45 }}
         className="w-full h-full"
       >
-        <color attach="background" args={["#020617"]} />
+        <color attach="background" args={["#151e45"]} />
         <ambientLight intensity={0.7} />
         <directionalLight
           position={[3, 4, 2]}

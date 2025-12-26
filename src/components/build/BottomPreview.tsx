@@ -19,16 +19,18 @@ const defaultPaperColors: Record<PaperType, string> = {
   unbleached: "#8B6F47",
   hemp: "#9FAF8A",
   bleached: "#F9FAFB",
-  colored: "#F97316",
+  colored: "#690c0f",
   rice: "#F5F5F0",
   bamboo: "#D4C4A8",
 };
 
 const filterColors: Record<FilterType, string> = {
   folded: "#CBD5F5",
-  spiral: "#0EA5E9",
+  spiral: "#FDD",
   ceramic: "#F9FAFB",
   glass: "#A5F3FC",
+  wooden: "#D4A574",
+  ball: "#FFB84D",
 };
 
 function useOptionalTexture(url?: string | null) {
@@ -91,6 +93,40 @@ function getPaperMetalness(paperType: PaperType | null): number {
   }
 }
 
+// Create annular sector shape using THREE.Shape
+function createAnnularSectorShape(
+  innerRadius: number,
+  outerRadius: number,
+  startAngle: number,
+  endAngle: number
+): THREE.Shape {
+  const shape = new THREE.Shape();
+  const segments = 32;
+
+  // Outer arc
+  for (let i = 0; i <= segments; i++) {
+    const angle = startAngle + (endAngle - startAngle) * (i / segments);
+    const x = outerRadius * Math.cos(angle);
+    const y = outerRadius * Math.sin(angle);
+    if (i === 0) {
+      shape.moveTo(x, y);
+    } else {
+      shape.lineTo(x, y);
+    }
+  }
+
+  // Inner arc (reverse)
+  for (let i = segments; i >= 0; i--) {
+    const angle = startAngle + (endAngle - startAngle) * (i / segments);
+    const x = innerRadius * Math.cos(angle);
+    const y = innerRadius * Math.sin(angle);
+    shape.lineTo(x, y);
+  }
+
+  shape.lineTo(outerRadius * Math.cos(startAngle), outerRadius * Math.sin(startAngle));
+  return shape;
+}
+
 const PaperRoll: React.FC<{ state: CustomizationState; isExpanded: boolean }> = ({ state, isExpanded }) => {
   const groupRef = useRef<THREE.Group>(null);
   const customTexture = useOptionalTexture(state.paperTextureUrl || undefined);
@@ -129,8 +165,52 @@ const PaperRoll: React.FC<{ state: CustomizationState; isExpanded: boolean }> = 
   );
 };
 
+// Cache wood texture outside component to avoid hook issues
+let cachedWoodTexture: THREE.DataTexture | null = null;
+function getCachedWoodTexture(): THREE.DataTexture {
+  if (!cachedWoodTexture) {
+    const size = 512;
+    const data = new Uint8Array(size * size * 4);
+    
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        const index = (i * size + j) * 4;
+        const x = (i / size) * 20;
+        const y = (j / size) * 20;
+        
+        const grain = Math.sin(y * 0.5) * 0.3 + Math.sin(y * 2) * 0.1;
+        const rings = Math.sin(x * 0.3) * 0.2;
+        const noise1 = Math.sin(x * 3 + y * 0.5) * 0.1;
+        const noise2 = Math.sin(x * 7 + y * 1.2) * 0.05;
+        const noise3 = Math.sin(x * 15 + y * 2.5) * 0.03;
+        
+        let r = 200 + grain * 30 + rings * 20 + noise1 * 15 + noise2 * 10 + noise3 * 5;
+        let g = 168 + grain * 25 + rings * 15 + noise1 * 12 + noise2 * 8 + noise3 * 4;
+        let b = 118 + grain * 20 + rings * 12 + noise1 * 10 + noise2 * 6 + noise3 * 3;
+        
+        const darkGrain = Math.abs(Math.sin(y * 0.5)) < 0.1 ? 0.7 : 1.0;
+        r *= darkGrain;
+        g *= darkGrain;
+        b *= darkGrain;
+        
+        data[index] = Math.max(0, Math.min(255, r));
+        data[index + 1] = Math.max(0, Math.min(255, g));
+        data[index + 2] = Math.max(0, Math.min(255, b));
+        data[index + 3] = 255;
+      }
+    }
+    
+    cachedWoodTexture = new THREE.DataTexture(data, size, size);
+    cachedWoodTexture.wrapS = cachedWoodTexture.wrapT = THREE.RepeatWrapping;
+    cachedWoodTexture.repeat.set(1, 3);
+    cachedWoodTexture.needsUpdate = true;
+  }
+  return cachedWoodTexture;
+}
+
 const FilterRoll: React.FC<{ state: CustomizationState; isExpanded: boolean }> = ({ state, isExpanded }) => {
   const groupRef = useRef<THREE.Group>(null);
+  // Always call hooks at the top level - never conditionally
   const texture = useOptionalTexture(
     state.filterType === "ceramic" ? null : state.filterTextureUrl || undefined
   );
@@ -273,6 +353,59 @@ const FilterRoll: React.FC<{ state: CustomizationState; isExpanded: boolean }> =
     );
   }
 
+  if (state.filterType === "wooden") {
+    return (
+      <group ref={groupRef}>
+        {/* Main tapered cylindrical body with wood texture */}
+        {/* Lower radius: 0.28, Upper radius: 0.28 * 0.3 = 0.084 */}
+        <mesh rotation={[-Math.PI / 2.2, 0, 0]}>
+          <cylinderGeometry args={[0.18, 0.28, 0.9, 64]} />
+          <meshStandardMaterial
+            color="#C9A876"
+            roughness={0.9}
+            metalness={0.02}
+            map={getCachedWoodTexture()}
+          />
+        </mesh>
+      </group>
+    );
+  }
+
+  if (state.filterType === "ball") {
+    const ballColor = state.filterColorHex || "#FF6B6B";
+    const cylinderRadius = 0.28;
+    const cylinderHeight = 0.9;
+    const ballRadius = 0.12;
+    // Position ball on middle-top curved surface (about 60% up the cylinder)
+    const angle = Math.PI / 4; // 45 degrees
+    const ballX = Math.cos(angle) * cylinderRadius;
+    const ballY = cylinderHeight * 0.3 + ballRadius * 0.7; // Middle-top area (30% from top)
+    const ballZ = Math.sin(angle) * cylinderRadius;
+    
+    return (
+      <group ref={groupRef}>
+        {/* Cylindrical filter - light orange */}
+        <mesh rotation={[-Math.PI / 2.2, 0, 0]}>
+          <cylinderGeometry args={[cylinderRadius, cylinderRadius, cylinderHeight, 64]} />
+          <meshStandardMaterial
+            color="#FFB84D"
+            roughness={0.6}
+            metalness={0.18}
+          />
+        </mesh>
+        {/* Ball on middle-top curved surface - color changes with color picker */}
+        <mesh rotation={[-Math.PI / 2.2, 0, 0]} position={[ballX, ballY, ballZ]}>
+          <sphereGeometry args={[ballRadius, 32, 32]} />
+          <meshStandardMaterial
+            color={ballColor}
+            roughness={0.3}
+            metalness={0.4}
+          />
+        </mesh>
+      </group>
+    );
+  }
+
   return null;
 };
 
@@ -332,7 +465,7 @@ const BottomPreview: React.FC<BottomPreviewProps> = ({ state, type, onPreviewTog
             <FilterRoll state={state} isExpanded={isExpanded} />
           )}
         </Suspense>
-        <OrbitControls enablePan={true} enableZoom={true} enableRotate={isExpanded} />
+        <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
       </Canvas>
       {isExpanded && (
         <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 font-medium">

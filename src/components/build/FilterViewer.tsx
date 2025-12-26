@@ -7,6 +7,60 @@ import * as THREE from "three";
 import type { FilterType, ConeSize } from "./types";
 import { preloadTexture, getCachedTexture } from "@/src/utils/textureCache";
 
+// Generate realistic wood texture
+function generateWoodTexture(): THREE.DataTexture {
+  const size = 512;
+  const data = new Uint8Array(size * size * 4);
+  
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+      const index = (i * size + j) * 4;
+      const x = (i / size) * 20;
+      const y = (j / size) * 20;
+      
+      // Wood grain pattern - horizontal lines with variation
+      const grain = Math.sin(y * 0.5) * 0.3 + Math.sin(y * 2) * 0.1;
+      const rings = Math.sin(x * 0.3) * 0.2;
+      
+      // Add noise for wood texture
+      const noise1 = Math.sin(x * 3 + y * 0.5) * 0.1;
+      const noise2 = Math.sin(x * 7 + y * 1.2) * 0.05;
+      const noise3 = Math.sin(x * 15 + y * 2.5) * 0.03;
+      
+      // Base wood color (light brown/tan)
+      let r = 200 + grain * 30 + rings * 20 + noise1 * 15 + noise2 * 10 + noise3 * 5;
+      let g = 168 + grain * 25 + rings * 15 + noise1 * 12 + noise2 * 8 + noise3 * 4;
+      let b = 118 + grain * 20 + rings * 12 + noise1 * 10 + noise2 * 6 + noise3 * 3;
+      
+      // Darker grain lines
+      const darkGrain = Math.abs(Math.sin(y * 0.5)) < 0.1 ? 0.7 : 1.0;
+      r *= darkGrain;
+      g *= darkGrain;
+      b *= darkGrain;
+      
+      data[index] = Math.max(0, Math.min(255, r));
+      data[index + 1] = Math.max(0, Math.min(255, g));
+      data[index + 2] = Math.max(0, Math.min(255, b));
+      data[index + 3] = 255;
+    }
+  }
+  
+  const texture = new THREE.DataTexture(data, size, size);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 3); // Repeat vertically for wood grain
+  texture.needsUpdate = true;
+  return texture;
+}
+
+// Cache for wood texture
+let woodTextureCache: THREE.DataTexture | null = null;
+function getWoodTexture(): THREE.DataTexture {
+  if (!woodTextureCache) {
+    woodTextureCache = generateWoodTexture();
+  }
+  return woodTextureCache;
+}
+
 interface FilterViewerProps {
   filterType: FilterType | null;
   filterColorHex?: string | null;
@@ -103,18 +157,28 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
   const [foldProgress, setFoldProgress] = useState(0.0);
   const [rollProgress, setRollProgress] = useState(0);
   const transitionCompleteRef = useRef(false);
-  const texture = useOptionalTexture(filterTextureUrl || undefined);
+  // Don't use custom texture for wooden filter
+  const texture = useOptionalTexture(
+    filterType === "wooden" ? null : filterTextureUrl || undefined
+  );
+  const woodTexture = useMemo(() => {
+    return filterType === "wooden" ? getWoodTexture() : null;
+  }, [filterType]);
 
   const baseColor = useMemo(() => {
     if (filterColorHex) return filterColorHex;
 
     switch (filterType) {
       case "spiral":
-        return "#0EA5E9";
+        return "#FDD";
       case "ceramic":
         return "#F9FAFB";
       case "glass":
         return "#A5F3FC";
+      case "ball":
+        return "#FFB84D"; // Light orange
+      case "wooden":
+        return "#D4A574"; // Wood color
       case "folded":
       default:
         return "#CBD5F5";
@@ -186,10 +250,12 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
     []
   );
 
-  // Show annular sector shape when not transitioning (except ceramic)
-  const showAnnularSector = !isTransitioning && filterType && filterType !== "ceramic";
-  const showRoll = isTransitioning && rollProgress > 0.1 && filterType && filterType !== "ceramic";
+  // Show annular sector shape when not transitioning (except ceramic, wooden, ball)
+  const showAnnularSector = !isTransitioning && filterType && filterType !== "ceramic" && filterType !== "wooden" && filterType !== "ball";
+  const showRoll = isTransitioning && rollProgress > 0.1 && filterType && filterType !== "ceramic" && filterType !== "wooden" && filterType !== "ball";
   const showCeramic = filterType === "ceramic";
+  const showWooden = filterType === "wooden";
+  const showBall = filterType === "ball";
 
   return (
     <group ref={groupRef} scale={sizeScale}>
@@ -208,8 +274,8 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
             rotation={[-Math.PI / 2, 0, 0]}
             scale={[0.15 + (1 - rollProgress) * 0.85, 0.15 + (1 - rollProgress) * 0.85, rollProgress]}
             position={[
-              0.6 * rollProgress, // Move to bottom-right square position
-              -1.2 * rollProgress, // Lower position
+              1.8 * rollProgress, // Move to bottom-right square position
+              -1.5 * rollProgress, // Lower position
               0
             ]}
           >
@@ -224,7 +290,7 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
         <group 
           rotation={[-Math.PI / 2.2, 0, 0]}
           scale={isTransitioning ? [0.15 + (1 - rollProgress) * 0.85, 0.15 + (1 - rollProgress) * 0.85, 1] : [1, 1, 1]}
-          position={isTransitioning ? [0.6 * rollProgress, -1.2 * rollProgress, 0] : [0, 0, 0]}
+          position={isTransitioning ? [1.8 * rollProgress, -1.5 * rollProgress, 0] : [0, 0, 0]}
         >
           <mesh>
             <cylinderGeometry
@@ -262,6 +328,69 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
         </group>
       )}
 
+      {/* Wooden filter - tapered cylinder with realistic wood texture */}
+      {showWooden && (
+        // <group 
+        //   rotation={[-Math.PI / 2.2, 0, 0]}
+        //   scale={isTransitioning ? [0.15 + (1 - rollProgress) * 0.85, 0.15 + (1 - rollProgress) * 0.85, 1] : [1, 1, 1]}
+        //   position={isTransitioning ? [1.8 * rollProgress, -1.5 * rollProgress, 0] : [0, 0, 0]}
+        // >
+        //   {/* Main tapered cylindrical body with wood texture */}
+        //   {/* Lower radius: 0.26, Upper radius: 0.26 * 0.3 = 0.078 */}
+        //   <mesh>
+        //     <cylinderGeometry args={[0.16, 0.26, 0.9, 64]} />
+        //     <meshStandardMaterial
+        //       color="#C9A876"
+        //       roughness={0.9}
+        //       metalness={0.02}
+        //       map={woodTexture}
+        //     />
+        //   </mesh>
+        // </group>
+      <group ref={groupRef}>
+        {/* Main tapered cylindrical body with wood texture */}
+        {/* Lower radius: 0.28, Upper radius: 0.28 * 0.3 = 0.084 */}
+        <mesh rotation={[-Math.PI / 2.2, 0, 0]}>
+          <cylinderGeometry args={[0.18, 0.28, 0.9, 64]} />
+          <meshStandardMaterial
+            color="#C9A876"
+            roughness={0.9}
+            metalness={0.02}
+            map={woodTexture}
+          />
+        </mesh>
+      </group>
+      )}
+
+      {/* Ball filter - light orange cylinder with colored ball on middle-top curved surface */}
+      {showBall && (
+        <group 
+          rotation={[-Math.PI / 2.2, 0, 0]}
+          scale={isTransitioning ? [0.15 + (1 - rollProgress) * 0.85, 0.15 + (1 - rollProgress) * 0.85, 1] : [1, 1, 1]}
+          position={isTransitioning ? [1.8 * rollProgress, -1.5 * rollProgress, 0] : [0, 0, 0]}
+        >
+          {/* Cylindrical filter - light orange */}
+          <mesh>
+            <cylinderGeometry args={[0.26, 0.26, 0.9, 64]} />
+            <meshStandardMaterial
+              color="#FFB84D"
+              roughness={0.6}
+              metalness={0.18}
+            />
+          </mesh>
+          {/* Ball on middle-top curved surface - color changes with color picker */}
+          {/* Position on cylinder edge at middle-top (about 60% up the cylinder) */}
+          <mesh position={[0.26 * Math.cos(Math.PI / 4), 0.08 + 0.12 * 0.7, 0.26 * Math.sin(Math.PI / 4)]}>
+            <sphereGeometry args={[0.12, 32, 32]} />
+            <meshStandardMaterial
+              color={filterColorHex || "#FF6B6B"}
+              roughness={0.3}
+              metalness={0.4}
+            />
+          </mesh>
+        </group>
+      )}
+
       {/* Fallback */}
       {!filterType && (
         <mesh rotation={[-Math.PI / 2.3, 0, 0]}>
@@ -281,7 +410,7 @@ const FilterViewer: React.FC<FilterViewerProps> = (props) => {
         camera={{ position: [1.5, 1.3, 3.2], fov: 45 }}
         className="w-full h-full"
       >
-        <color attach="background" args={["#020617"]} />
+        <color attach="background" args={["#151e45"]} />
         <ambientLight intensity={0.65} />
         <directionalLight
           position={[4, 5, 3]}

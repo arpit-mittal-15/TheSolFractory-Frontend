@@ -29,6 +29,8 @@ const filterColorMap: Record<FilterType, string> = {
   spiral: "#0EA5E9",
   ceramic: "#E5E7EB",
   glass: "#A5F3FC",
+  wooden: "#D4A574",
+  ball: "#FFB84D",
 };
 
 const sizeScaleMap: Record<ConeSize, number> = {
@@ -48,6 +50,49 @@ export function clearTextureCache() {
   textureCache.forEach((t) => t.dispose());
   textureCache.clear();
   texturePromises.clear();
+}
+
+// Generate realistic wood texture (cached)
+let woodTextureCache: THREE.DataTexture | null = null;
+function getWoodTexture(): THREE.DataTexture {
+  if (!woodTextureCache) {
+    const size = 512;
+    const data = new Uint8Array(size * size * 4);
+    
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        const index = (i * size + j) * 4;
+        const x = (i / size) * 20;
+        const y = (j / size) * 20;
+        
+        const grain = Math.sin(y * 0.5) * 0.3 + Math.sin(y * 2) * 0.1;
+        const rings = Math.sin(x * 0.3) * 0.2;
+        const noise1 = Math.sin(x * 3 + y * 0.5) * 0.1;
+        const noise2 = Math.sin(x * 7 + y * 1.2) * 0.05;
+        const noise3 = Math.sin(x * 15 + y * 2.5) * 0.03;
+        
+        let r = 200 + grain * 30 + rings * 20 + noise1 * 15 + noise2 * 10 + noise3 * 5;
+        let g = 168 + grain * 25 + rings * 15 + noise1 * 12 + noise2 * 8 + noise3 * 4;
+        let b = 118 + grain * 20 + rings * 12 + noise1 * 10 + noise2 * 6 + noise3 * 3;
+        
+        const darkGrain = Math.abs(Math.sin(y * 0.5)) < 0.1 ? 0.7 : 1.0;
+        r *= darkGrain;
+        g *= darkGrain;
+        b *= darkGrain;
+        
+        data[index] = Math.max(0, Math.min(255, r));
+        data[index + 1] = Math.max(0, Math.min(255, g));
+        data[index + 2] = Math.max(0, Math.min(255, b));
+        data[index + 3] = 255;
+      }
+    }
+    
+    woodTextureCache = new THREE.DataTexture(data, size, size);
+    woodTextureCache.wrapS = woodTextureCache.wrapT = THREE.RepeatWrapping;
+    woodTextureCache.repeat.set(1, 3);
+    woodTextureCache.needsUpdate = true;
+  }
+  return woodTextureCache;
 }
 
 /* -------------------------
@@ -236,7 +281,14 @@ const OpenConfigMesh: React.FC<OpenConfigViewerProps> = ({ state }) => {
 
       {/* Filter in cylindrical "rolled" form with image texture */}
       <mesh rotation={[-Math.PI / 2.4, 0, 0]} position={[0, 0.15, 0.95]}>
-        <cylinderGeometry args={[0.22, 0.22, 2.6, 64, 1, true]} />
+        <cylinderGeometry args={[
+          state.filterType === "wooden" ? 0.22 * 0.3 : 0.22, 
+          state.filterType === "wooden" ? 0.22 : 0.22, 
+          2.6, 
+          64, 
+          1, 
+          true
+        ]} />
         {state.filterType === "ceramic" ? (
           <>
             <meshPhysicalMaterial
@@ -274,6 +326,39 @@ const OpenConfigMesh: React.FC<OpenConfigViewerProps> = ({ state }) => {
             envMapIntensity={1.2}
             side={THREE.DoubleSide}
           />
+        ) : state.filterType === "wooden" ? (
+          <meshStandardMaterial
+            key={`filter-wooden-wood-texture`}
+            color="#C9A876"
+            roughness={0.9}
+            metalness={0.02}
+            map={getWoodTexture()}
+            side={THREE.DoubleSide}
+          />
+        ) : state.filterType === "ball" ? (
+          <>
+            <meshStandardMaterial
+              key={`filter-ball-${state.filterTextureUrl || "default"}`}
+              color="#FFB84D"
+              roughness={0.6}
+              metalness={0.18}
+              side={THREE.DoubleSide}
+            />
+            {/* Ball on middle-top curved surface - color changes with color picker */}
+            {/* Position on cylinder edge at middle-top (about 60% up) */}
+            <mesh position={[
+              0.22 * Math.cos(Math.PI / 4),
+              2.6 * 0.3 + 0.1 * 0.7,
+              0.22 * Math.sin(Math.PI / 4)
+            ]}>
+              <sphereGeometry args={[0.1, 32, 32]} />
+              <meshStandardMaterial
+                color={state.filterColorHex || "#FF6B6B"}
+                roughness={0.3}
+                metalness={0.4}
+              />
+            </mesh>
+          </>
         ) : (
           <meshStandardMaterial
             key={`filter-material-${state.filterTextureUrl || "default"}-${filterColor}`}
@@ -296,7 +381,7 @@ const OpenConfigViewer: React.FC<OpenConfigViewerProps> = ({ state }) => {
   return (
     <div className="relative w-full h-[320px] md:h-[380px] rounded-xl border border-blue-400/40 bg-gradient-to-b from-slate-950 via-black to-slate-950 shadow-[0_0_25px_rgba(15,23,42,0.9)] overflow-hidden">
       <Canvas shadows camera={{ position: [1.7, 1.6, 3.7], fov: 45 }} className="w-full h-full">
-        <color attach="background" args={["#020617"]} />
+        <color attach="background" args={["#151e45"]} />
         <ambientLight intensity={0.65} />
         <directionalLight
           position={[4, 5, 3]}

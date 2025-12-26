@@ -11,7 +11,7 @@ interface Step0Props {
 
 const Step0: React.FC<Step0Props> = ({ step, nextStep }) => {
   return (
-    <section className="px-4 py-8 sm:py-3 space-y-8 mt-7.5">
+    <section className="px-[10%] py-[20%] sm:py-3 space-y-[3%] mt-[4%]">
       {/* Hero */}
       <div className="text-center space-y-4">
         <h1
@@ -69,7 +69,7 @@ const Step0: React.FC<Step0Props> = ({ step, nextStep }) => {
       </div>
 
       {/* CTA */}
-      <div className="flex justify-center mt-13">
+      <div className="flex justify-center mt-[5%]">
         <Button
           onClick={nextStep}
           className="btn-liquid w-full max-w-xs sm:max-w-sm px-8 py-5 text-[10px] font-bold uppercase tracking-[0.25em] text-white rounded-full border border-blue-500 bg-blue-600/80 hover:bg-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.7)]"
