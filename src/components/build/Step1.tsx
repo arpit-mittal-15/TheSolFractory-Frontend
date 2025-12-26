@@ -1,10 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, Palette, Image as ImageIcon } from "lucide-react";
 import { PAPER_TYPES, type CustomizationState } from "./types";
 import Header from "./Header";
 import PaperViewer from "./PaperViewer";
 import StepIndicator from "./StepIndicator";
+import BottomPreview from "./BottomPreview";
+import { preloadTexture } from "@/src/utils/textureCache";
 
 interface Step1Props {
   step: number;
@@ -23,6 +25,7 @@ const Step1: React.FC<Step1Props> = ({
 }) => {
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     updateState({ paperColorHex: event.target.value });
@@ -35,10 +38,24 @@ const Step1: React.FC<Step1Props> = ({
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        updateState({ paperTextureUrl: reader.result });
+        const imageUrl = reader.result;
+        updateState({ paperTextureUrl: imageUrl });
+        // Preload image immediately for future steps
+        preloadTexture(imageUrl).catch(console.error);
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleNext = () => {
+    setIsTransitioning(true);
+  };
+
+  const handleTransitionComplete = () => {
+    setTimeout(() => {
+      setIsTransitioning(false);
+      nextStep();
+    }, 500); // Longer delay for smoother transition
   };
 
   return (
@@ -71,7 +88,14 @@ const Step1: React.FC<Step1Props> = ({
               paperType={state.paperType}
               paperColorHex={state.paperColorHex}
               paperTextureUrl={state.paperTextureUrl}
+              isTransitioning={isTransitioning}
+              onTransitionComplete={handleTransitionComplete}
             />
+            {/* Bottom Preview Squares inside canvas */}
+            <div className="absolute bottom-4 left-1/6 transform -translate-x-1/2 flex gap-3 items-center z-10">
+              <BottomPreview state={state} type="paper" />
+              <BottomPreview state={state} type="filter" />
+            </div>
             {/* Color + upload controls */}
             <div className="absolute top-0 right-3 flex items-center gap-2 z-10">
               <button
@@ -174,8 +198,8 @@ const Step1: React.FC<Step1Props> = ({
               Previous
             </Button>
             <Button
-              onClick={nextStep}
-              disabled={!state.paperType}
+              onClick={handleNext}
+              disabled={!state.paperType || isTransitioning}
               className="btn-glass-panel ml-75 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT

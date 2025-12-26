@@ -12,7 +12,7 @@ import {
   GlassWater,
 } from "lucide-react";
 
-export type PaperType = "unbleached" | "hemp" | "bleached" | "colored";
+export type PaperType = "unbleached" | "hemp" | "bleached" | "colored" | "rice" | "bamboo";
 export type FilterType = "folded" | "spiral" | "ceramic" | "glass";
 export type ConeSize = "70mm" | "84mm" | "98mm" | "109mm";
 export type LotSize = "sample" | "small" | "medium" | "large" | "custom";
@@ -50,7 +50,17 @@ export const PAPER_TYPES = [
   {
     id: "colored" as PaperType,
     name: "Colored Paper",
-    description: "Natural and organic, for a pure experience.",
+    description: "Vibrant colors with smooth texture.",
+  },
+  {
+    id: "rice" as PaperType,
+    name: "Rice Paper",
+    description: "Ultra-thin and refined, nearly transparent.",
+  },
+  {
+    id: "bamboo" as PaperType,
+    name: "Bamboo Paper",
+    description: "All-natural organic bamboo with unique texture.",
   },
 ];
 
@@ -82,6 +92,14 @@ export const FILTER_TYPES = [
     icon: GlassWater,
   },
 ];
+
+// Cone dimensions in mm (from image reference)
+export const CONE_DIMENSIONS: Record<ConeSize, { topDiameter: number; bottomDiameter: number; height: number }> = {
+  "70mm": { topDiameter: 9.9, bottomDiameter: 5.5, height: 70 },
+  "84mm": { topDiameter: 10.8, bottomDiameter: 5.5, height: 84 },
+  "98mm": { topDiameter: 11.7, bottomDiameter: 5.5, height: 98 },
+  "109mm": { topDiameter: 12.4, bottomDiameter: 5.5, height: 109 },
+};
 
 export const CONE_SIZES = [
   {

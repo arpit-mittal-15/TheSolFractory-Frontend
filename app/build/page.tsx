@@ -11,6 +11,7 @@ import Step2 from "@/src/components/build/Step2";
 import Step3 from "@/src/components/build/Step3";
 import Step4 from "@/src/components/build/step4";
 import Checkout from "@/src/components/build/Checkout";
+import BottomPreview from "@/src/components/build/BottomPreview";
 import {
   type CustomizationState,
   getLotSizeName,
@@ -96,6 +97,9 @@ export default function BuildPage() {
     // router.push("/catalog");
   };
 
+  // Show bottom preview for steps 1-4
+  const showBottomPreview = step >= 1 && step <= 4;
+
   return (
     <div className="min-h-screen font-[Manrope]">
       <Navbar />
@@ -157,6 +161,7 @@ export default function BuildPage() {
               handleAddToCart={handleAddToCart}
             />
           )}
+
         </div>
       </main>
       <Footer />

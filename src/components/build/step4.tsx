@@ -1,9 +1,9 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Check, Palette } from "lucide-react";
-import Header from "./Header";
+import { ArrowLeft, ArrowRight, Check, Palette, Download } from "lucide-react";
 import ConeViewer from "./ConeViewer";
 import StepIndicator from "./StepIndicator";
+import BottomPreview from "./BottomPreview";
 import {
   LOT_SIZES,
   type CustomizationState,
@@ -26,6 +26,27 @@ const Step4: React.FC<Step4Props> = ({
   prevStep,
   nextStep,
 }) => {
+
+
+const handleDownload = async () => {
+  try {
+    const { exportConeToPDF } = await import("@/src/utils/pdfExportClient");
+    
+    // Get the canvas from the ConeViewer specifically
+    const coneViewerCanvas = document.querySelector(".w-full.h-full canvas") as HTMLCanvasElement;
+    
+    if (coneViewerCanvas) {
+      await exportConeToPDF(state, coneViewerCanvas);
+    } else {
+      console.error("Canvas not found");
+      alert("Failed to find canvas. Please try again.");
+    }
+  } catch (error) {
+    console.error("Failed to export PDF:", error);
+    alert("Failed to export PDF. Please try again.");
+  }
+};
+
   return (
     <div className="space-y-8">
 
@@ -51,6 +72,18 @@ const Step4: React.FC<Step4Props> = ({
           <div className="relative">
             <StepIndicator currentStep={4} />
             <ConeViewer state={state} focusStep="lot" />
+            <button
+              onClick={handleDownload}
+              className="absolute bottom-5 right-4 w-12 h-12 rounded-full bg-blue-500/80 hover:bg-blue-500 border-2 border-blue-400 flex items-center justify-center shadow-lg transition-all hover:scale-110 z-10"
+              title="Download Preview as PDF"
+            >
+              <Download className="w-5 h-5 text-white" />
+            </button>
+            {/* Bottom Preview Squares inside canvas */}
+            {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-3 items-center z-10">
+              <BottomPreview state={state} type="paper" />
+              <BottomPreview state={state} type="filter" />
+            </div> */}
           </div>
         </div>
 

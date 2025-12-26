@@ -5,6 +5,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { CustomizationState, ConeSize, PaperType, FilterType } from "./types";
+import { getProceduralTexture } from "./PaperViewer";
+import { preloadTexture, getCachedTexture } from "@/src/utils/textureCache";
 
 interface OpenConfigViewerProps {
   state: CustomizationState;
@@ -18,6 +20,8 @@ const paperColorMap: Record<PaperType, string> = {
   hemp: "#A8E6CF",
   bleached: "#F9FAFB",
   colored: "#F97316",
+  rice: "#F5F5F0",
+  bamboo: "#D4C4A8",
 };
 
 const filterColorMap: Record<FilterType, string> = {
@@ -53,7 +57,10 @@ export function clearTextureCache() {
    ------------------------- */
 function useOptionalTextureCached(url?: string | null) {
   const [texture, setTexture] = useState<THREE.Texture | null>(() => {
-    if (url && textureCache.has(url)) return textureCache.get(url)!;
+    if (url) {
+      const cached = getCachedTexture(url);
+      if (cached) return cached;
+    }
     return null;
   });
 
@@ -63,58 +70,49 @@ function useOptionalTextureCached(url?: string | null) {
       return;
     }
 
-    if (textureCache.has(url)) {
-      setTexture(textureCache.get(url)!);
+    const cached = getCachedTexture(url);
+    if (cached) {
+      setTexture(cached);
       return;
     }
 
-    if (texturePromises.has(url)) {
-      texturePromises
-        .get(url)!
-        .then((tex) => setTexture(tex))
-        .catch(() => setTexture(null));
-      return;
-    }
-
-    const loader = new THREE.TextureLoader();
-    const promise = new Promise<THREE.Texture>((resolve, reject) => {
-      loader.load(
-        url,
-        (tex) => {
-          try {
-            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(1, 1);
-            (tex as any).encoding = (THREE as any).sRGBEncoding //?? THREE.LinearEncoding;
-            tex.needsUpdate = true;
-            textureCache.set(url, tex);
-            resolve(tex);
-          } catch (e) {
-            console.error("Texture prepare error:", e);
-            textureCache.set(url, tex);
-            resolve(tex);
-          }
-        },
-        undefined,
-        (err) => {
-          console.error("TextureLoader failed for", url, err);
-          reject(err);
-        }
-      );
-    });
-
-    texturePromises.set(url, promise);
-
-    promise
-      .then((tex) => setTexture(tex))
-      .catch(() => setTexture(null))
-      .finally(() => texturePromises.delete(url));
-
-    return () => {
-      // keep base texture cached; do not dispose here
-    };
+    preloadTexture(url)
+      .then((tex) => {
+        setTexture(tex);
+      })
+      .catch((error) => {
+        console.error("Failed to load texture:", error);
+        setTexture(null);
+      });
   }, [url]);
 
   return texture;
+}
+
+function getPaperRoughness(paperType: PaperType | null): number {
+  if (!paperType) return 0.75;
+  switch (paperType) {
+    case "unbleached": return 0.9;
+    case "hemp": return 0.85;
+    case "bleached": return 0.7;
+    case "colored": return 0.72;
+    case "rice": return 0.6;
+    case "bamboo": return 0.88;
+    default: return 0.75;
+  }
+}
+
+function getPaperMetalness(paperType: PaperType | null): number {
+  if (!paperType) return 0.03;
+  switch (paperType) {
+    case "rice": return 0.08;
+    case "bleached": return 0.05;
+    case "colored": return 0.04;
+    case "hemp": return 0.03;
+    case "unbleached":
+    case "bamboo": return 0.02;
+    default: return 0.03;
+  }
 }
 
 /* -------------------------
@@ -143,6 +141,14 @@ const OpenConfigMesh: React.FC<OpenConfigViewerProps> = ({ state }) => {
   const basePaperTexture = useOptionalTextureCached(state.paperTextureUrl ?? null);
   const baseFilterTexture = useOptionalTextureCached(state.filterTextureUrl ?? null);
 
+  // FIXED: Add procedural texture support
+  const proceduralPaperTexture = useMemo(() => {
+    if (!state.paperTextureUrl) {
+      return getProceduralTexture(state.paperType);
+    }
+    return null;
+  }, [state.paperType, state.paperTextureUrl]);
+
   // If both urls equal, prefer shared base to reduce memory and keep cache consistent
   const sameTextureUrl =
     state.paperTextureUrl &&
@@ -154,60 +160,49 @@ const OpenConfigMesh: React.FC<OpenConfigViewerProps> = ({ state }) => {
   const [paperMap, setPaperMap] = useState<THREE.Texture | null>(null);
   const [filterMap, setFilterMap] = useState<THREE.Texture | null>(null);
 
-  // v-repeat heuristics
-  const paperVRepeat = Math.max(1, Math.round(2.0 * sizeScale));
-  const filterVRepeat = Math.max(1, Math.round(2.6 * sizeScale));
-
   useEffect(() => {
-    // dispose any existing clones
-    setPaperMap((prev) => {
-      if (prev) prev.dispose();
-      return null;
-    });
-    setFilterMap((prev) => {
-      if (prev) prev.dispose();
-      return null;
-    });
-
-    const paperSource = baseShared ?? basePaperTexture;
+    // FIXED: Use custom texture OR procedural texture
+    const paperSource = baseShared ?? basePaperTexture ?? proceduralPaperTexture;
     const filterSource = baseShared ?? baseFilterTexture;
+
+    let newPaperMap: THREE.Texture | null = null;
+    let newFilterMap: THREE.Texture | null = null;
 
     if (paperSource) {
       const clone = paperSource.clone();
       clone.wrapS = clone.wrapT = THREE.RepeatWrapping;
-      clone.repeat.set(1, paperVRepeat);
+      clone.repeat.set(1, 1);
       clone.needsUpdate = true;
-      setPaperMap(clone);
-    } else {
-      setPaperMap(null);
+      newPaperMap = clone;
     }
 
     if (filterSource) {
       const clone = filterSource.clone();
       clone.wrapS = clone.wrapT = THREE.RepeatWrapping;
-      clone.repeat.set(1, filterVRepeat);
+      clone.repeat.set(1, 1);
       clone.needsUpdate = true;
-      setFilterMap(clone);
-    } else {
-      setFilterMap(null);
+      newFilterMap = clone;
     }
 
+    setPaperMap((prev) => {
+      if (prev && prev !== proceduralPaperTexture) prev.dispose();
+      return newPaperMap;
+    });
+
+    setFilterMap((prev) => {
+      if (prev) prev.dispose();
+      return newFilterMap;
+    });
+
     return () => {
-      setPaperMap((prev) => {
-        if (prev) prev.dispose();
-        return null;
-      });
-      setFilterMap((prev) => {
-        if (prev) prev.dispose();
-        return null;
-      });
+      if (newPaperMap && newPaperMap !== proceduralPaperTexture) newPaperMap.dispose();
+      if (newFilterMap) newFilterMap.dispose();
     };
   }, [
     basePaperTexture,
     baseFilterTexture,
     baseShared,
-    paperVRepeat,
-    filterVRepeat,
+    proceduralPaperTexture,
     state.paperTextureUrl,
     state.filterTextureUrl,
   ]);
@@ -230,10 +225,10 @@ const OpenConfigMesh: React.FC<OpenConfigViewerProps> = ({ state }) => {
       <mesh rotation={[-Math.PI / 2.4, 0, 0]} position={[0, 0.05, 0]} ref={paperRef}>
         <planeGeometry args={[3.1, 2.0, 24, 4]} />
         <meshStandardMaterial
-          key={`paper-material-${state.paperTextureUrl || "default"}-${paperColor}`}
+          key={`paper-material-${state.paperTextureUrl || "default"}-${paperColor}-${state.paperType}`}
           color={paperColor}
-          roughness={paperMap ? 0.6 : 0.75}
-          metalness={0.03}
+          roughness={paperMap ? 0.6 : getPaperRoughness(state.paperType)}
+          metalness={getPaperMetalness(state.paperType)}
           map={paperMap ?? null}
           side={THREE.DoubleSide}
         />
@@ -242,14 +237,53 @@ const OpenConfigMesh: React.FC<OpenConfigViewerProps> = ({ state }) => {
       {/* Filter in cylindrical "rolled" form with image texture */}
       <mesh rotation={[-Math.PI / 2.4, 0, 0]} position={[0, 0.15, 0.95]}>
         <cylinderGeometry args={[0.22, 0.22, 2.6, 64, 1, true]} />
-        <meshStandardMaterial
-          key={`filter-material-${state.filterTextureUrl || "default"}-${filterColor}`}
-          color={filterColor}
-          roughness={filterMap ? 0.45 : 0.55}
-          metalness={0.15}
-          map={filterMap ?? null}
-          side={THREE.DoubleSide}
-        />
+        {state.filterType === "ceramic" ? (
+          <>
+            <meshPhysicalMaterial
+              key={`filter-ceramic-${state.filterTextureUrl || "default"}`}
+              color="#f7f7f5"
+              roughness={0.55}
+              metalness={0}
+              clearcoat={0.35}
+              clearcoatRoughness={0.25}
+              side={THREE.DoubleSide}
+            />
+            {/* 4 black dots on top - NO TEXTURE for ceramic */}
+            {Array.from({ length: 4 }).map((_, i) => {
+              const angle = (i / 4) * Math.PI * 2;
+              const ringRadius = 0.11;
+              const x = Math.cos(angle) * ringRadius;
+              const z = Math.sin(angle) * ringRadius;
+              return (
+                <mesh key={i} position={[x, 1.3, z]}>
+                  <cylinderGeometry args={[0.025, 0.025, 0.08, 24]} />
+                  <meshStandardMaterial color="#000000" />
+                </mesh>
+              );
+            })}
+          </>
+        ) : state.filterType === "glass" ? (
+          <meshStandardMaterial
+            key={`filter-glass-${state.filterTextureUrl || "default"}-${filterColor}`}
+            color={filterColor}
+            roughness={filterMap ? 0.15 : 0.2}
+            metalness={0.6}
+            transparent={true}
+            opacity={0.7}
+            map={filterMap ?? null}
+            envMapIntensity={1.2}
+            side={THREE.DoubleSide}
+          />
+        ) : (
+          <meshStandardMaterial
+            key={`filter-material-${state.filterTextureUrl || "default"}-${filterColor}`}
+            color={filterColor}
+            roughness={filterMap ? 0.45 : 0.55}
+            metalness={0.15}
+            map={filterMap ?? null}
+            side={THREE.DoubleSide}
+          />
+        )}
       </mesh>
     </group>
   );

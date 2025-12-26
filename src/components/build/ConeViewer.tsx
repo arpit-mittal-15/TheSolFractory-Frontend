@@ -5,6 +5,11 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage } from "@react-three/drei";
 import * as THREE from "three";
 import type { CustomizationState, PaperType, ConeSize, FilterType } from "./types";
+import { CONE_DIMENSIONS } from "./types";
+
+// Add this import at the top of ConeViewer.tsx
+import { getProceduralTexture } from "./PaperViewer";
+import { preloadTexture, getCachedTexture } from "@/src/utils/textureCache";
 
 interface ConeViewerProps {
   state: CustomizationState;
@@ -19,6 +24,8 @@ const paperColorMap: Record<PaperType, string> = {
   hemp: "#A8E6CF",
   bleached: "#F9FAFB",
   colored: "#F97316",
+  rice: "#F5F5F0",
+  bamboo: "#D4C4A8",
 };
 
 const filterColorMap: Record<FilterType, string> = {
@@ -35,15 +42,39 @@ const sizeScaleMap: Record<ConeSize, number> = {
   "109mm": 1.25,
 };
 
+function getPaperRoughness(paperType: PaperType | null): number {
+  if (!paperType) return 0.62;
+  switch (paperType) {
+    case "unbleached": return 0.9;
+    case "hemp": return 0.85;
+    case "bleached": return 0.7;
+    case "colored": return 0.72;
+    case "rice": return 0.6;
+    case "bamboo": return 0.88;
+    default: return 0.62;
+  }
+}
+
+function getPaperMetalness(paperType: PaperType | null): number {
+  if (!paperType) return 0;
+  switch (paperType) {
+    case "rice": return 0.08;
+    case "bleached": return 0.05;
+    case "colored": return 0.04;
+    case "hemp": return 0.03;
+    case "unbleached":
+    case "bamboo": return 0.02;
+    default: return 0;
+  }
+}
+
 /* -------------------------
    Module-level texture cache + promise map
-   Keeps textures alive while SPA is running -> instant reload when returning to step
    ------------------------- */
 const textureCache = new Map<string, THREE.Texture>();
 const texturePromises = new Map<string, Promise<THREE.Texture>>();
 
 export function clearTextureCache() {
-  // useful in dev: clear and dispose all cached textures
   textureCache.forEach((t) => t.dispose());
   textureCache.clear();
   texturePromises.clear();
@@ -51,209 +82,150 @@ export function clearTextureCache() {
 
 /* -------------------------
    Hook: load texture with caching
-   - returns cached texture immediately if available
-   - otherwise loads and caches it
-   - DOES NOT dispose cached textures (they persist until clearTextureCache called)
    ------------------------- */
 function useOptionalTexture(url?: string | null) {
   const [texture, setTexture] = useState<THREE.Texture | null>(() => {
-    if (url && textureCache.has(url)) return textureCache.get(url)!;
+    if (url) {
+      const cached = getCachedTexture(url);
+      if (cached) return cached;
+    }
     return null;
   });
 
   useEffect(() => {
     if (!url) {
-      setTexture((prev) => {
-        // do NOT dispose cached textures here; clones will be cleaned up elsewhere
-        return null;
-      });
+      setTexture(null);
       return;
     }
 
-    // if cached, return it synchronously
-    if (textureCache.has(url)) {
-      setTexture(textureCache.get(url)!);
+    const cached = getCachedTexture(url);
+    if (cached) {
+      setTexture(cached);
       return;
     }
 
-    // if already loading, hook into that promise
-    if (texturePromises.has(url)) {
-      texturePromises.get(url)!.then((tex) => {
-        setTexture(tex);
-      }).catch(() => {
+    preloadTexture(url)
+      .then((tex) => setTexture(tex))
+      .catch((error) => {
+        console.error("Failed to load texture:", error);
         setTexture(null);
       });
-      return;
-    }
-
-    // else create loader promise and store it in texturePromises
-    const loader = new THREE.TextureLoader();
-    const promise = new Promise<THREE.Texture>((resolve, reject) => {
-      loader.load(
-        url,
-        (tex) => {
-          try {
-            // prepare texture for general use
-            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(1, 1);
-            // cast to any so TypeScript build won't fail (encoding may not be on type)
-            (tex as any).encoding = (THREE as any).sRGBEncoding // ?? THREE.LinearEncoding;
-            tex.needsUpdate = true;
-
-            // cache the base texture so future calls reuse it
-            textureCache.set(url, tex);
-
-            resolve(tex);
-          } catch (e) {
-            // if something weird occurs, still resolve with tex but log
-            console.error("Texture prepare error:", e);
-            textureCache.set(url, tex);
-            resolve(tex);
-          }
-        },
-        undefined,
-        (err) => {
-          console.error("TextureLoader failed for", url, err);
-          reject(err);
-        }
-      );
-    });
-
-    texturePromises.set(url, promise);
-
-    promise
-      .then((tex) => {
-        // set local state
-        setTexture(tex);
-      })
-      .catch(() => {
-        setTexture(null);
-      })
-      .finally(() => {
-        // once resolved or rejected, remove the promise holder (cache stays if loaded)
-        texturePromises.delete(url);
-      });
-
-    // no disposal of the cached base texture here: we want it to persist across component unmounts
-    return () => {
-      // no-op
-    };
   }, [url]);
 
   return texture;
 }
 
 /* -------------------------
-   ConeMesh: uses cached base textures and creates per-mesh clones
-   so each mesh can set repeat independently.
-   Clones are disposed on change/unmount to avoid leaks.
+   ConeMesh component
    ------------------------- */
+
+// Then update the ConeMesh component texture handling:
+
 const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
-  // load base textures (these are cached across the SPA lifecycle)
+  // load base textures
   const basePaperTexture = useOptionalTexture(state.paperTextureUrl ?? null);
   const baseFilterTexture = useOptionalTexture(state.filterTextureUrl ?? null);
 
-  // if both URLs are identical, prefer the shared base texture
   const sameTextureUrl =
     state.paperTextureUrl &&
     state.filterTextureUrl &&
     state.paperTextureUrl === state.filterTextureUrl;
-
   const baseSharedTexture = sameTextureUrl ? basePaperTexture ?? baseFilterTexture : null;
 
-  // colors and scale
+  // FIXED: Add procedural texture support like PaperViewer
+  const proceduralPaperTexture = useMemo(() => {
+    if (!state.paperTextureUrl) {
+      return getProceduralTexture(state.paperType);
+    }
+    return null;
+  }, [state.paperType, state.paperTextureUrl]);
+
+  // colors - FIXED: Apply dimming factor to make cone darker
   const paperColor = useMemo(() => {
-    if (state.paperColorHex) return state.paperColorHex;
-    return paperColorMap[state.paperType ?? "hemp"];
+    const baseColor = state.paperColorHex || paperColorMap[state.paperType ?? "hemp"];
+    // Darken the color by 40%
+    const color = new THREE.Color(baseColor);
+    color.multiplyScalar(0.6); // 0.6 = 40% darker
+    return '#' + color.getHexString();
   }, [state.paperType, state.paperColorHex]);
 
   const filterColor = useMemo(() => {
-    if (state.filterColorHex) return state.filterColorHex;
-    return state.filterType ? filterColorMap[state.filterType] : "#E5E7EB";
+    const baseColor = state.filterColorHex || (state.filterType ? filterColorMap[state.filterType] : "#E5E7EB");
+    // Darken the color by 40%
+    const color = new THREE.Color(baseColor);
+    color.multiplyScalar(0.6); // 0.6 = 40% darker
+    return '#' + color.getHexString();
   }, [state.filterType, state.filterColorHex]);
 
-  const sizeScale = useMemo(
-    () => (state.coneSize ? sizeScaleMap[state.coneSize] : 1),
-    [state.coneSize]
-  );
+  // cone dimensions (keep fixed as per previous requirement)
+  const coneDimensions = useMemo(() => {
+    return {
+      topRadius: 0.22,
+      bottomRadius: 0.12,
+      height: 2.4,
+    };
+  }, []);
 
   const highlightEmissive = focusStep === "paper" ? 0.35 : 0.08;
 
-  // geometry params (adjusted per your requests)
-  const paperTopRadius = 0.22 * sizeScale;
-  const paperBottomRadius = 0.12 * sizeScale;
-  const paperHeight = 2.4 * sizeScale;
-  const paperCenterY = 0.6 * sizeScale;
+  const paperTopRadius = coneDimensions.topRadius;
+  const paperBottomRadius = coneDimensions.bottomRadius;
+  const paperHeight = coneDimensions.height;
+  const paperCenterY = paperHeight / 2 + 0.1;
 
   const filterTopRadius = paperBottomRadius;
-  const filterBottomRadius = 0.14 * sizeScale;
-  const filterHeight = 0.60 * sizeScale;
-
+  const filterBottomRadius = 0.14;
+  const filterHeight = 0.6;
   const paperBottomY = paperCenterY - paperHeight / 2;
   const filterCenterY = paperBottomY - filterHeight / 2;
 
-  // per-mesh clones so we can freely set repeat per mesh
+  // texture clones
   const [paperMap, setPaperMap] = useState<THREE.Texture | null>(null);
   const [filterMap, setFilterMap] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
-    // cleanup old clones
-    setPaperMap((prev) => {
-      if (prev) prev.dispose();
-      return null;
-    });
-    setFilterMap((prev) => {
-      if (prev) prev.dispose();
-      return null;
-    });
-
-    // choose base sources (shared or per-type)
-    const paperSource = baseSharedTexture ?? basePaperTexture;
+    // FIXED: Use custom texture OR procedural texture
+    const paperSource = baseSharedTexture ?? basePaperTexture ?? proceduralPaperTexture;
     const filterSource = baseSharedTexture ?? baseFilterTexture;
 
-    // create paper clone if source available
+    let newPaperMap: THREE.Texture | null = null;
+    let newFilterMap: THREE.Texture | null = null;
+
     if (paperSource) {
       const clone = paperSource.clone();
       clone.wrapS = clone.wrapT = THREE.RepeatWrapping;
-      // a heuristic repeat that makes texture stretch reasonably along height
-      const vRepeat = Math.max(1, Math.round(paperHeight));
-      clone.repeat.set(1, vRepeat);
+      clone.repeat.set(1, 1);
       clone.needsUpdate = true;
-      setPaperMap(clone);
-    } else {
-      setPaperMap(null);
+      newPaperMap = clone;
     }
 
-    // create filter clone if source available
     if (filterSource) {
       const clone = filterSource.clone();
       clone.wrapS = clone.wrapT = THREE.RepeatWrapping;
-      const vRepeat = Math.max(1, Math.round(filterHeight * 1.5));
-      clone.repeat.set(1, vRepeat);
+      clone.repeat.set(1, 1);
       clone.needsUpdate = true;
-      setFilterMap(clone);
-    } else {
-      setFilterMap(null);
+      newFilterMap = clone;
     }
 
-    // dispose clones on unmount / param change
+    setPaperMap((prev) => {
+      if (prev && prev !== proceduralPaperTexture) prev.dispose();
+      return newPaperMap;
+    });
+
+    setFilterMap((prev) => {
+      if (prev) prev.dispose();
+      return newFilterMap;
+    });
+
     return () => {
-      setPaperMap((prev) => {
-        if (prev) prev.dispose();
-        return null;
-      });
-      setFilterMap((prev) => {
-        if (prev) prev.dispose();
-        return null;
-      });
+      if (newPaperMap && newPaperMap !== proceduralPaperTexture) newPaperMap.dispose();
+      if (newFilterMap) newFilterMap.dispose();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     basePaperTexture,
     baseFilterTexture,
     baseSharedTexture,
-    paperHeight,
-    filterHeight,
+    proceduralPaperTexture,
     state.paperTextureUrl,
     state.filterTextureUrl,
   ]);
@@ -266,77 +238,107 @@ const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
           args={[paperTopRadius, paperBottomRadius, paperHeight, 80, 1, true]}
         />
         <meshStandardMaterial
-          key={`cone-paper-material-${state.paperTextureUrl || "default"}-${paperColor}`}
+          key={`cone-paper-material-${state.paperTextureUrl || "default"}-${paperColor}-${state.paperType}`}
           color={paperColor}
-          roughness={paperMap ? 0.55 : 0.62}
+          roughness={paperMap ? 0.85 : getPaperRoughness(state.paperType)}
           metalness={0}
           map={paperMap ?? null}
-          emissive={paperColor}
-          emissiveIntensity={highlightEmissive}
+          emissive="#000000"
+          emissiveIntensity={0}
           side={THREE.DoubleSide}
         />
       </mesh>
 
       {/* Filter */}
       <mesh position={[0, filterCenterY, 0]} castShadow>
-        <cylinderGeometry
-          args={[filterTopRadius, filterBottomRadius, filterHeight, 48]}
-        />
-        <meshStandardMaterial
-          key={`cone-filter-material-${state.filterTextureUrl || "default"}-${filterColor}`}
-          color={filterColor}
-          roughness={filterMap ? 0.28 : 0.32}
-          metalness={0.12}
-          map={filterMap ?? null}
-          emissive={focusStep === "filter" ? filterColor : "#000000"}
-          emissiveIntensity={focusStep === "filter" ? 0.35 : 0.04}
-          side={THREE.DoubleSide}
-        />
+        <cylinderGeometry args={[filterTopRadius, filterBottomRadius, filterHeight, 48]} />
+        {state.filterType === "ceramic" ? (
+          <>
+            <meshPhysicalMaterial
+              key={`cone-filter-ceramic-${state.filterTextureUrl || "default"}`}
+              color="#f7f7f5"
+              roughness={0.55}
+              metalness={0}
+              clearcoat={0.35}
+              clearcoatRoughness={0.25}
+              emissive="#000000"
+              emissiveIntensity={0}
+              side={THREE.DoubleSide}
+            />
+            {Array.from({ length: 4 }).map((_, i) => {
+              const angle = (i / 4) * Math.PI * 2;
+              const ringRadius = filterTopRadius * 0.4;
+              const x = Math.cos(angle) * ringRadius;
+              const z = Math.sin(angle) * ringRadius;
+              return (
+                <mesh key={i} position={[x, filterHeight / 2, z]}>
+                  <cylinderGeometry args={[0.008, 0.008, 0.02, 16]} />
+                  <meshStandardMaterial color="#000000" />
+                </mesh>
+              );
+            })}
+          </>
+        ) : state.filterType === "glass" ? (
+          <meshStandardMaterial
+            key={`cone-filter-glass-${state.filterTextureUrl || "default"}-${filterColor}`}
+            color={filterColor}
+            roughness={filterMap ? 0.3 : 0.35}
+            metalness={0.6}
+            transparent
+            opacity={0.7}
+            map={filterMap ?? null}
+            emissive="#000000"
+            emissiveIntensity={0}
+            envMapIntensity={1.2}
+            side={THREE.DoubleSide}
+          />
+        ) : (
+                      <meshStandardMaterial
+            key={`cone-filter-material-${state.filterTextureUrl || "default"}-${filterColor}`}
+            color={filterColor}
+            roughness={filterMap ? 0.7 : 0.75}
+            metalness={0}
+            map={filterMap ?? null}
+            emissive="#000000"
+            emissiveIntensity={0}
+            side={THREE.DoubleSide}
+          />
+        )}
       </mesh>
     </group>
   );
 };
 
 /* -------------------------
-   Viewer wrapper
+   ConeViewer wrapper
    ------------------------- */
+// Replace the Canvas section in ConeViewer.tsx wrapper component
+
 const ConeViewer: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
   return (
     <div className="w-full h-[320px] md:h-[390px] rounded-xl border border-blue-400/40 bg-gradient-to-b from-slate-900 via-slate-950 to-black shadow-[0_0_25px_rgba(15,23,42,0.9)] overflow-hidden">
-      <Canvas
-        shadows
-        camera={{ position: [2.2, 1.4, 2.2], fov: 40 }}
-        className="w-full h-full"
-      >
+      <Canvas shadows camera={{ position: [2.2, 1.4, 2.2], fov: 40 }} className="w-full h-full">
         <color attach="background" args={["#020617"]} />
-        <ambientLight intensity={0.4} />
+        {/* FIXED: Reduced ambient light intensity */}
+        <ambientLight intensity={0.25} />
+        {/* FIXED: Reduced directional light intensity */}
         <directionalLight
           position={[4, 6, 3]}
-          intensity={1.1}
+          intensity={0.7}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
         />
-        <pointLight position={[-4, 3, -4]} intensity={0.4} />
+        {/* FIXED: Reduced point light intensity */}
+        <pointLight position={[-4, 3, -4]} intensity={0.25} />
 
         <Suspense fallback={null}>
-          <Stage
-            intensity={0.8}
-            environment="studio"
-            adjustCamera={false}
-            shadows="contact"
-          >
+          <Stage intensity={0.5} environment="studio" adjustCamera={false} shadows="contact">
             <ConeMesh state={state} focusStep={focusStep} />
           </Stage>
         </Suspense>
 
-        <OrbitControls
-          enablePan={false}
-          enableDamping
-          dampingFactor={0.12}
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI}
-        />
+        <OrbitControls enablePan={false} enableDamping dampingFactor={0.12} minPolarAngle={0} maxPolarAngle={Math.PI} />
       </Canvas>
     </div>
   );

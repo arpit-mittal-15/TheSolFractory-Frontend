@@ -108,10 +108,10 @@ function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
         backdropFilter: "blur(30px)",
         WebkitBackdropFilter: "blur(30px)",
         border: "8px solid rgba(255, 255, 255, 0.12)",
-        borderTop: "12px solid rgba(255, 255, 255, 0.35)",
-        borderLeft: "10px solid rgba(255, 255, 255, 0.2)",
-        borderBottom: "12px solid rgba(0, 0, 0, 0.4)",
-        borderRight: "10px solid rgba(0, 0, 0, 0.25)",
+        borderTop: "15px solid rgba(255, 255, 255, 0)",
+        borderLeft: "13px solid rgba(255, 255, 255, 0.2)",
+        borderBottom: "15px solid rgba(255, 255, 255, 0)",
+        borderRight: "14px solid rgba(0, 0, 0, 0.2)",
         boxShadow: `
           0 25px 50px -12px rgba(0, 0, 0, 0.5),
           inset 0 4px 8px rgba(255, 255, 255, 0.5),
@@ -126,7 +126,7 @@ function Card({ item, isActive }: { item: CardItem, isActive: boolean }) {
         alt={item.label}
         fill
         sizes="(max-width: 768px) 90vw, 320px"
-        className={`object-cover border rounded-xl ${isActive ? 'opacity-100' : 'opacity-55'}`}
+        className={`object-cover border ${isActive ? 'opacity-100' : 'opacity-55'}`}
       />
 
       {/* FULL IMAGE INNER BORDER (ALWAYS VISIBLE) */}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
+import ConeViewer from "./ConeViewer";
 import {
   type CustomizationState,
   getPaperTypeName,
@@ -34,6 +35,26 @@ const Checkout: React.FC<CheckoutProps> = ({
 }) => {
   // const quantity = getQuantity(state);
   const totalPrice = getTotalPrice(state);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+const handleDownload = async () => {
+  try {
+    const { exportConeToPDF } = await import("@/src/utils/pdfExportClient");
+    
+    // Get the canvas from the ConeViewer specifically
+    const coneViewerCanvas = document.querySelector(".w-full.h-full canvas") as HTMLCanvasElement;
+    
+    if (coneViewerCanvas) {
+      await exportConeToPDF(state, coneViewerCanvas);
+    } else {
+      console.error("Canvas not found");
+      alert("Failed to find canvas. Please try again.");
+    }
+  } catch (error) {
+    console.error("Failed to export PDF:", error);
+    alert("Failed to export PDF. Please try again.");
+  }
+};
 
   return (
     <div className="space-y-10 max-w-5xl mx-auto">

@@ -5,69 +5,46 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { FilterType, ConeSize } from "./types";
+import { preloadTexture, getCachedTexture } from "@/src/utils/textureCache";
 
 interface FilterViewerProps {
   filterType: FilterType | null;
   filterColorHex?: string | null;
   filterTextureUrl?: string | null;
   coneSize?: ConeSize | null;
+  isTransitioning?: boolean; // When true, animate filter rolling up
+  onTransitionComplete?: () => void;
 }
 
 function useOptionalTexture(url?: string | null) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [texture, setTexture] = useState<THREE.Texture | null>(() => {
+    if (url) {
+      const cached = getCachedTexture(url);
+      if (cached) return cached;
+    }
+    return null;
+  });
 
   useEffect(() => {
     if (!url) {
-      setTexture((prevTex) => {
-        if (prevTex) {
-          prevTex.dispose();
-        }
-        return null;
-      });
+      setTexture(null);
       return;
     }
 
-    const loader = new THREE.TextureLoader();
-    let cancelled = false;
+    const cached = getCachedTexture(url);
+    if (cached) {
+      setTexture(cached);
+      return;
+    }
 
-    loader.load(
-      url,
-      (tex) => {
-        if (!cancelled) {
-          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-          tex.repeat.set(1, 1);
-          tex.needsUpdate = true;
-          setTexture((prevTex) => {
-            if (prevTex) {
-              prevTex.dispose();
-            }
-            return tex;
-          });
-        }
-      },
-      undefined,
-      (error) => {
+    preloadTexture(url)
+      .then((tex) => {
+        setTexture(tex);
+      })
+      .catch((error) => {
         console.error("Failed to load texture:", error);
-        if (!cancelled) {
-          setTexture((prevTex) => {
-            if (prevTex) {
-              prevTex.dispose();
-            }
-            return null;
-          });
-        }
-      }
-    );
-
-    return () => {
-      cancelled = true;
-      setTexture((prevTex) => {
-        if (prevTex) {
-          prevTex.dispose();
-        }
-        return null;
+        setTexture(null);
       });
-    };
   }, [url]);
 
   return texture;
@@ -80,14 +57,52 @@ const sizeScaleMap: Record<ConeSize, number> = {
   "109mm": 1.25,
 };
 
+// Create annular sector shape using THREE.Shape
+function createAnnularSectorShape(
+  innerRadius: number,
+  outerRadius: number,
+  startAngle: number,
+  endAngle: number
+): THREE.Shape {
+  const shape = new THREE.Shape();
+  const segments = 32;
+
+  // Outer arc
+  for (let i = 0; i <= segments; i++) {
+    const angle = startAngle + (endAngle - startAngle) * (i / segments);
+    const x = outerRadius * Math.cos(angle);
+    const y = outerRadius * Math.sin(angle);
+    if (i === 0) {
+      shape.moveTo(x, y);
+    } else {
+      shape.lineTo(x, y);
+    }
+  }
+
+  // Inner arc (reverse)
+  for (let i = segments; i >= 0; i--) {
+    const angle = startAngle + (endAngle - startAngle) * (i / segments);
+    const x = innerRadius * Math.cos(angle);
+    const y = innerRadius * Math.sin(angle);
+    shape.lineTo(x, y);
+  }
+
+  shape.lineTo(outerRadius * Math.cos(startAngle), outerRadius * Math.sin(startAngle));
+  return shape;
+}
+
 const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
   filterType,
   filterColorHex,
   filterTextureUrl,
   coneSize,
+  isTransitioning = false,
+  onTransitionComplete,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const [foldProgress, setFoldProgress] = useState(0.0);
+  const [rollProgress, setRollProgress] = useState(0);
+  const transitionCompleteRef = useRef(false);
   const texture = useOptionalTexture(filterTextureUrl || undefined);
 
   const baseColor = useMemo(() => {
@@ -108,25 +123,42 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
 
   const sizeScale = coneSize ? sizeScaleMap[coneSize] : 1;
 
-  // Reset and animate "roll" progress when type or texture changes
   useEffect(() => {
-    setFoldProgress(0);
-  }, [filterType, filterColorHex, filterTextureUrl, coneSize]);
+    if (isTransitioning) {
+      setRollProgress(0);
+      transitionCompleteRef.current = false;
+    } else {
+      setFoldProgress(0);
+      setRollProgress(0);
+    }
+  }, [filterType, filterColorHex, filterTextureUrl, coneSize, isTransitioning]);
 
   useFrame((stateFrame, delta) => {
     const t = stateFrame.clock.getElapsedTime();
 
-    // Slow auto rotation of the whole group
-    if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.6;
-    }
+    if (isTransitioning) {
+      // Roll animation - slower and smoother
+      setRollProgress((prev) => {
+        const next = prev + delta * 0.8; // Slower animation
+        if (next >= 1 && !transitionCompleteRef.current) {
+          transitionCompleteRef.current = true;
+          onTransitionComplete?.();
+          return 1;
+        }
+        return Math.min(1, next);
+      });
+    } else {
+      // Normal animation
+      if (groupRef.current && filterType !== "ceramic") {
+        groupRef.current.rotation.y = t * 0.6;
+      }
 
-    // Roll-up animation progress
-    setFoldProgress((prev) => {
-      const target = 1;
-      const next = prev + (target - prev) * Math.min(1, delta * 2.5);
-      return next > 0.99 ? 1 : next;
-    });
+      setFoldProgress((prev) => {
+        const target = 1;
+        const next = prev + (target - prev) * Math.min(1, delta * 2.5);
+        return next > 0.99 ? 1 : next;
+      });
+    }
   });
 
   const roughness = filterTextureUrl ? 0.45 : 0.6;
@@ -148,79 +180,57 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
     [baseColor, roughness, filterType, texture, filterTextureUrl, filterColorHex]
   );
 
+  // Memoize annular sector shape - 30% circle (0.3 * 2π ≈ 1.88 radians)
+  const annularSectorShape = useMemo(
+    () => createAnnularSectorShape(0.3, 1.2, 0, Math.PI * 0.6), // 30% of full circle
+    []
+  );
+
+  // Show annular sector shape when not transitioning (except ceramic)
+  const showAnnularSector = !isTransitioning && filterType && filterType !== "ceramic";
+  const showRoll = isTransitioning && rollProgress > 0.1 && filterType && filterType !== "ceramic";
+  const showCeramic = filterType === "ceramic";
+
   return (
     <group ref={groupRef} scale={sizeScale}>
-      {/* Folded: thick multi-layer toilet-paper style roll */}
-      {filterType === "folded" && (
+      {/* Annular Sector Shape (template) - shown before transition */}
+      {showAnnularSector && (
+        <mesh rotation={[-Math.PI / 2.2, 0, 0]} position={[0, 0, 0]}>
+          <shapeGeometry args={[annularSectorShape]} />
+          {commonMaterial}
+        </mesh>
+      )}
+
+      {/* Roll animation when transitioning - moving INTO bottom square */}
+      {showRoll && (
         <group>
-          {/* Thick cylindrical roll made from multiple shells */}
-          {Array.from({ length: 5 }).map((_, i) => {
-            const layerRatio = i / 5;
-            const radiusTop = 0.22 + layerRatio * 0.15 * foldProgress; // top smaller
-            const radiusBottom = 0.45 + layerRatio * 0.2 * foldProgress; // bottom bigger
-            const height = 1.80 + layerRatio * 0.12; // extra height
-            return (
-              <mesh key={i} position={[0.7, 0.1, 0]} rotation={[-Math.PI / 2.1, 0, 0]}>
-                <cylinderGeometry args={[radiusTop, radiusBottom, height, 72, 1, true]} />
-                {commonMaterial}
-              </mesh>
-            );
-          })}
+          <mesh 
+            rotation={[-Math.PI / 2, 0, 0]}
+            scale={[0.15 + (1 - rollProgress) * 0.85, 0.15 + (1 - rollProgress) * 0.85, rollProgress]}
+            position={[
+              0.6 * rollProgress, // Move to bottom-right square position
+              -1.2 * rollProgress, // Lower position
+              0
+            ]}
+          >
+            <cylinderGeometry args={[0.12, 0.12, 0.35, 32]} />
+            {commonMaterial}
+          </mesh>
         </group>
       )}
 
-      {/* Spiral: similar thick roll plus zig-zag sheets between layers */}
-      {filterType === "spiral" && (
-        <group>
-          {/* Main spiral-style roll built from multiple cylindrical shells */}
-        {Array.from({ length: 6 }).map((_, i) => {
-          const layerRatio = i / 6;
-          const radiusTop = 0.18 + layerRatio * 0.18 * foldProgress;
-          const radiusBottom = 0.45 + layerRatio * 0.22 * foldProgress;
-          const height = 1.8 + layerRatio * 0.12; // extra height
-          const twist = layerRatio * Math.PI * 0.3 * foldProgress;
-          return (
-            <mesh key={i} position={[0.4, 0.05, 0]} rotation={[-Math.PI / 2.1, twist, 0]}>
-              <cylinderGeometry args={[radiusTop, radiusBottom, height, 100, 1, true]} />
-              {commonMaterial}
-            </mesh>
-          );
-        })}
-
-          {/* Zig-zag strips running across the hollow inner gap of the roll */}
-          {Array.from({ length: 3 }).map((_, i) => {
-            const ratio = i / 5;
-            const angle = ratio * Math.PI * 2 + Math.PI * 0.4 * foldProgress;
-            const innerR = 0.06; // well inside hollow core (roll starts around 0.22)
-            const cx = 0.4; // roll center x-position
-            const cz = 0;
-            const x = cx + Math.cos(angle) * innerR;
-            const z = cz + Math.sin(angle) * innerR;
-            const tilt = (i % 2 === 0 ? 1 : -1) * 0.35;
-
-            return (
-              <mesh
-                key={`zig-inner-${i}`}
-                position={[x, 0.06, z]}
-                rotation={[-Math.PI / 2.1, angle + tilt * 0.2, 0]}
-              >
-                {/* Small strip so it clearly stays inside hole */}
-                <planeGeometry args={[0.76, 0.26, 6, 8]} />
-                {commonMaterial}
-              </mesh>
-            );
-          })}
-        </group>
-      )}
-
-      {filterType === "ceramic" && (
-        <group rotation={[-Math.PI / 2.2, 0, 0]}>
-          {/* Main ceramic cylinder */}
+      {/* Ceramic filter - always show actual filter, animate INTO square when transitioning */}
+      {showCeramic && (
+        <group 
+          rotation={[-Math.PI / 2.2, 0, 0]}
+          scale={isTransitioning ? [0.15 + (1 - rollProgress) * 0.85, 0.15 + (1 - rollProgress) * 0.85, 1] : [1, 1, 1]}
+          position={isTransitioning ? [0.6 * rollProgress, -1.2 * rollProgress, 0] : [0, 0, 0]}
+        >
           <mesh>
             <cylinderGeometry
               args={[
-                0.28 * foldProgress, // top radious
-                0.12 * foldProgress, // bottom radius
+                0.26 * (isTransitioning ? 1 - rollProgress : foldProgress),
+                0.26 * (isTransitioning ? 1 - rollProgress : foldProgress),
                 0.9,
                 64,
                 1,
@@ -236,48 +246,29 @@ const AnimatedFilterPaper: React.FC<FilterViewerProps> = ({
             />
           </mesh>
 
-          {/* Holes on FLAT TOP FACE */}
-          {Array.from({ length: 5 }).map((_, i) => {
-            const angle = (i / 5) * Math.PI * 2;
+          {/* 4 black dots on FLAT TOP FACE (original design) */}
+          {Array.from({ length: 4 }).map((_, i) => {
+            const angle = (i / 4) * Math.PI * 2;
             const ringRadius = 0.11;
-
             const x = Math.cos(angle) * ringRadius;
             const z = Math.sin(angle) * ringRadius;
-
             return (
               <mesh key={i} position={[x, 0.45, z]}>
-                {/* vertical hole */}
                 <cylinderGeometry args={[0.025, 0.025, 0.08, 24]} />
-                <meshStandardMaterial color="#020617" />
+                <meshStandardMaterial color="#000000" />
               </mesh>
             );
           })}
         </group>
       )}
 
-      {filterType === "glass" && (
-        <group>
-          {/* Glass filter */}
-          <mesh rotation={[-Math.PI / 2.2, 0, 0]}>
-            <cylinderGeometry args={[0.26 * foldProgress, 0.14 * foldProgress, 0.85, 64, 1, true]} />
-            {commonMaterial}
-          </mesh>
-        </group>
-      )}
-
-      {/* Fallback simple strip if nothing selected yet */}
+      {/* Fallback */}
       {!filterType && (
         <mesh rotation={[-Math.PI / 2.3, 0, 0]}>
           <planeGeometry args={[2.2, 0.6, 1, 1]} />
           {commonMaterial}
         </mesh>
       )}
-
-      {/* Ground */}
-      {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.9, 0]} receiveShadow>
-        <circleGeometry args={[3, 48]} />
-        <meshStandardMaterial color="#020617" roughness={0.9} />
-      </mesh> */}
     </group>
   );
 };

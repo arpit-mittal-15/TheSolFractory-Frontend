@@ -4,8 +4,9 @@ import { IconTrafficCone } from "@tabler/icons-react";
 import { ArrowLeft, ArrowRight, Check, Palette } from "lucide-react";
 import Header from "./Header";
 import OpenConfigViewer from "./OpenConfigViewer";
-import { CONE_SIZES, type CustomizationState } from "./types";
+import { CONE_SIZES, CONE_DIMENSIONS, type CustomizationState } from "./types";
 import StepIndicator from "./StepIndicator";
+import BottomPreview from "./BottomPreview";
 
 interface Step3Props {
   step: number;
@@ -47,6 +48,11 @@ const Step3: React.FC<Step3Props> = ({
           <div className="relative">
             <StepIndicator currentStep={3} />
             <OpenConfigViewer state={state} />
+            {/* Bottom Preview Squares inside canvas */}
+            <div className="absolute bottom-4 left-1/6 transform -translate-x-1/2 flex gap-3 items-center z-10">
+              <BottomPreview state={state} type="paper" />
+              <BottomPreview state={state} type="filter" />
+            </div>
           </div>
         </div>
 
@@ -75,7 +81,7 @@ const Step3: React.FC<Step3Props> = ({
                     <Check className="h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
                   </div>
                 )}
-                <div className="flex flex-col h-20 items-center space-y-2">
+                <div className="flex flex-col h-24 items-center space-y-2">
                   <div className="text-2xl font-bold text-white">
                     {/* <IconTrafficCone size={56} stroke={1.3} /> */}
                   </div>
@@ -85,6 +91,13 @@ const Step3: React.FC<Step3Props> = ({
                   <div className="text-gray-400 text-xs text-center leading-snug">
                     {size.description}
                   </div>
+                  {CONE_DIMENSIONS[size.id] && (
+                    <div className="text-gray-500 text-[10px] text-center mt-1 space-y-0.5">
+                      <div>Top: {CONE_DIMENSIONS[size.id].topDiameter}mm</div>
+                      <div>Bottom: {CONE_DIMENSIONS[size.id].bottomDiameter}mm</div>
+                      <div>Height: {CONE_DIMENSIONS[size.id].height}mm</div>
+                    </div>
+                  )}
                 </div>
               </button>
             );

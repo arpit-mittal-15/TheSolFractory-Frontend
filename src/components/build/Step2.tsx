@@ -1,10 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowLeft, ArrowRight, Palette, Image as ImageIcon } from "lucide-react";
 import { FILTER_TYPES, type CustomizationState } from "./types";
 import Header from "./Header";
 import FilterViewer from "./FilterViewer";
 import StepIndicator from "./StepIndicator";
+import BottomPreview from "./BottomPreview";
+import { preloadTexture } from "@/src/utils/textureCache";
 
 interface Step2Props {
   step: number;
@@ -23,6 +25,7 @@ const Step2: React.FC<Step2Props> = ({
 }) => {
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     updateState({ filterColorHex: event.target.value });
@@ -35,10 +38,24 @@ const Step2: React.FC<Step2Props> = ({
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        updateState({ filterTextureUrl: reader.result });
+        const imageUrl = reader.result;
+        updateState({ filterTextureUrl: imageUrl });
+        // Preload image immediately for future steps
+        preloadTexture(imageUrl).catch(console.error);
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleNext = () => {
+    setIsTransitioning(true);
+  };
+
+  const handleTransitionComplete = () => {
+    setTimeout(() => {
+      setIsTransitioning(false);
+      nextStep();
+    }, 700); // Longer delay for smoother transition
   };
 
   return (
@@ -70,7 +87,14 @@ const Step2: React.FC<Step2Props> = ({
               filterColorHex={state.filterColorHex}
               filterTextureUrl={state.filterTextureUrl}
               coneSize={state.coneSize}
+              isTransitioning={isTransitioning}
+              onTransitionComplete={handleTransitionComplete}
             />
+            {/* Bottom Preview Squares inside canvas */}
+            <div className="absolute bottom-4 left-1/6 transform -translate-x-1/2 flex gap-3 items-center z-10">
+              <BottomPreview state={state} type="paper" />
+              <BottomPreview state={state} type="filter" />
+            </div>
             {/* Color + upload controls */}
             <div className="absolute top-0 right-3 flex items-center gap-2 z-10">
               <button
@@ -162,8 +186,8 @@ const Step2: React.FC<Step2Props> = ({
               Previous
             </Button>
             <Button
-              onClick={nextStep}
-              disabled={!state.paperType}
+              onClick={handleNext}
+              disabled={!state.filterType || isTransitioning}
               className="btn-glass-panel ml-75 cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               NEXT
