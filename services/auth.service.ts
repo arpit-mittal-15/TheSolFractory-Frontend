@@ -44,6 +44,16 @@ type UserResponse = {
 };
 
 export const AuthService = {
+
+  confirmEmail: async (userId: string, token: string) => {
+    return http<{ isSuccess: boolean; message: string }>(
+      `/api/auth/confirm-email?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`,
+      {
+        method: "GET", // must be GET
+      }
+    );
+  },
+
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     return http<AuthResponse>("/api/auth/register", {
       method: "POST",

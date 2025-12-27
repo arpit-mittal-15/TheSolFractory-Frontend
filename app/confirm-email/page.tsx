@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { AuthService } from "@/services/auth.service";
 
 export default function ConfirmEmailPage() {
   const params = useSearchParams();
@@ -21,75 +22,32 @@ export default function ConfirmEmailPage() {
     }
   }, [userId, token]);
 
-const confirmEmail = async () => {
-  if (!userId || !token) return;
+  const confirmEmail = async () => {
+    if (!userId || !token) return;
 
-  setStatus("loading");
-  setMessage(null);
-  setDebug(null);
+    setStatus("loading");
+    setMessage(null);
+    setDebug(null);
 
-  try {
-    const res = await fetch("/api/auth/confirm-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, token }),
-    });
+    try {
+      const data = await AuthService.confirmEmail(userId, token);
 
-    const contentType = res.headers.get("content-type");
-    let data: any = null;
-    let rawText: string | null = null;
-
-    // Safely parse response
-    if (contentType?.includes("application/json")) {
-      data = await res.json();
-    } else {
-      rawText = await res.text();
-    }
-
-    // ❌ Non-2xx HTTP status
-    if (!res.ok) {
+      if (data.isSuccess) {
+        setStatus("success");
+        setMessage("Your email has been verified. Redirecting to sign in...");
+        setTimeout(() => router.push("/login"), 4000);
+      } else {
+        setStatus("error");
+        setMessage(data.message || "Verification failed");
+      }
+    } catch (err: any) {
       setStatus("error");
-      setMessage(
-        data?.message ||
-        data?.error ||
-        `Request failed with status ${res.status}`
-      );
+      setMessage(err.message || "Network error");
 
-      setDebug({
-        httpStatus: res.status,
-        statusText: res.statusText,
-        responseBody: data ?? rawText,
-      });
-      return;
+      // Optional: show full error for dev
+      setDebug(err);
     }
-
-    // ✅ Success
-    if (data?.isSuccess) {
-      setStatus("success");
-      setMessage("Your email has been verified. Redirecting to sign in...");
-      setTimeout(() => router.push("/login"), 4000);
-    } else {
-      setStatus("error");
-      setMessage(data?.message || "Verification failed.");
-
-      setDebug({
-        httpStatus: res.status,
-        responseBody: data,
-      });
-    }
-
-  } catch (err: any) {
-    setStatus("error");
-    setMessage("Unexpected error occurred while confirming email.");
-
-    setDebug({
-      name: err?.name,
-      message: err?.message,
-      stack: err?.stack,
-    });
-  }
-};
-
+  };
 
 
   return (
