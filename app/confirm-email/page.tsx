@@ -21,6 +21,7 @@ export default function ConfirmEmailPage() {
 
   const confirmEmail = async () => {
     if (!userId || !token) return;
+
     try {
       setStatus("loading");
       setMessage(null);
@@ -31,27 +32,22 @@ export default function ConfirmEmailPage() {
         body: JSON.stringify({ userId, token }),
       });
 
-      let payload: any = null;
-      try {
-        payload = await res.json();
-      } catch (e) {
-        // ignore JSON parse error
-      }
+      const payload = await res.json();
 
-      if (res.ok) {
+      if (payload?.isSuccess) {
         setStatus("success");
         setMessage("Your email has been verified. Redirecting to sign in...");
-        // gentle redirect so user sees success state
         setTimeout(() => router.push("/login"), 4000);
       } else {
         setStatus("error");
-        setMessage(payload?.message ?? "Verification failed. The link may be expired or invalid.");
+        setMessage(payload?.message || "Verification failed. The link may be expired or invalid.");
       }
-    } catch (err) {
+    } catch {
       setStatus("error");
       setMessage("Network error. Please try again later.");
     }
   };
+
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center p-6">
