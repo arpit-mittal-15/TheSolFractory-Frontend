@@ -43,42 +43,42 @@ export default function SignupPage() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!agreeTerms) {
-    alert("Please accept terms & conditions");
-    return;
-  }
-
-  if (form.password !== form.confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
-
-  try {
-    const response = await AuthService.register({
-      email: form.email,
-      name: `${form.firstName} ${form.lastName}`,
-      phoneNumber: "",
-      password: form.password,
-      role: "User",
-    });
-
-    console.log("Register response:", response);
-
-    if (response.isSuccess) {
-      alert("Registration successful. Please login.");
-      router.push("/login");
+    if (!agreeTerms) {
+      alert("Please accept terms & conditions");
       return;
     }
 
-    throw new Error(response.message || "Registration failed");
-  } catch (err) {
-    alert(err instanceof Error ? err.message : "Something went wrong");
-    console.error(err);
-  }
-};
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await AuthService.register({
+        email: form.email,
+        name: `${form.firstName} ${form.lastName}`,
+        phoneNumber: "",
+        password: form.password,
+        role: "User",
+      });
+
+      console.log("Register response:", response);
+
+      if (response.isSuccess) {
+        alert("Registration successful. Please login.");
+        router.push("/login");
+        return;
+      }
+
+      throw new Error(response.message || "Registration failed");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Something went wrong");
+      console.error(err);
+    }
+  };
 
 
   const handleGoogleSignup = async (credentialResponse: CredentialResponse) => {

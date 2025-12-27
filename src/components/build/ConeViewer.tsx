@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage } from "@react-three/drei";
 import * as THREE from "three";
 import type { CustomizationState, PaperType, ConeSize, FilterType } from "./types";
+import { Stars } from "@/src/sharedcomponents/build/stars";
 
 // Add this import at the top of ConeViewer.tsx
 import { getProceduralTexture } from "./PaperViewer";
@@ -158,6 +159,7 @@ function useOptionalTexture(url?: string | null) {
 
   return texture;
 }
+
 
 /* -------------------------
    ConeMesh component
@@ -404,7 +406,11 @@ const ConeViewer: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
   return (
     <div className="w-full h-[320px] md:h-[390px] rounded-xl border border-blue-400/40 bg-gradient-to-b from-slate-900 via-slate-950 to-black shadow-[0_0_25px_rgba(15,23,42,0.9)] overflow-hidden">
       <Canvas shadows camera={{ position: [2.2, 1.4, 2.2], fov: 40 }} className="w-full h-full">
-        <color attach="background" args={["#151e45"]} />
+        {/* Pure black background */}
+        <color attach="background" args={["#000000"]} />
+
+        {/* Stars placed before scene lights and content so they appear "behind" */}
+        <Stars count={900} />
         {/* FIXED: Reduced ambient light intensity */}
         <ambientLight intensity={0.85} />
         {/* FIXED: Reduced directional light intensity */}
@@ -426,6 +432,31 @@ const ConeViewer: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
 
         <OrbitControls enablePan={false} enableDamping dampingFactor={0.12} minPolarAngle={0} maxPolarAngle={Math.PI} />
       </Canvas>
+      <div className="absolute top-15 left-6 flex flex-col gap-2 pointer-events-none">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-[1px] bg-white/40" />
+          <span className="text-[10px] uppercase tracking-[0.5em] text-white/50 font-medium">Precision Crafted</span>
+        </div>
+        <h2 className="text-3xl font-serif italic text-white/95 leading-none">The SOL Cone</h2>
+        <p className="text-[11px] text-white/30 tracking-wider max-w-[200px]">
+          Hand-selected materials meet high-precision manufacturing.
+        </p>
+      </div>
+
+      <div className="absolute bottom-8 left-8">
+        <div className="flex flex-col gap-1">
+          <div className="text-[9px] uppercase tracking-[0.2em] text-white/20">Current Profile</div>
+          <div className="text-xs text-white/60 font-mono tracking-tighter">
+            {state.coneSize || "---"} / {state.paperType || "---"} / {state.filterType || "---"}
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute top-14 right-8">
+        <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform duration-500">
+          <div className="w-1 h-1 rounded-full bg-white animate-ping" />
+        </div>
+      </div>
     </div>
   );
 };
