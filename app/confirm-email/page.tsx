@@ -11,6 +11,8 @@ export default function ConfirmEmailPage() {
 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
+  const [debug, setDebug] = useState<any>(null);
+
 
   useEffect(() => {
     if (!userId || !token) {
@@ -19,34 +21,75 @@ export default function ConfirmEmailPage() {
     }
   }, [userId, token]);
 
-  const confirmEmail = async () => {
-    if (!userId || !token) return;
+const confirmEmail = async () => {
+  if (!userId || !token) return;
 
-    try {
-      setStatus("loading");
-      setMessage(null);
+  setStatus("loading");
+  setMessage(null);
+  setDebug(null);
 
-      const res = await fetch("/api/auth/confirm-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, token }),
-      });
+  try {
+    const res = await fetch("/api/auth/confirm-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, token }),
+    });
 
-      const payload = await res.json();
+    const contentType = res.headers.get("content-type");
+    let data: any = null;
+    let rawText: string | null = null;
 
-      if (payload?.isSuccess) {
-        setStatus("success");
-        setMessage("Your email has been verified. Redirecting to sign in...");
-        setTimeout(() => router.push("/login"), 4000);
-      } else {
-        setStatus("error");
-        setMessage(payload?.message || "Verification failed. The link may be expired or invalid.");
-      }
-    } catch {
-      setStatus("error");
-      setMessage("Network error. Please try again later.");
+    // Safely parse response
+    if (contentType?.includes("application/json")) {
+      data = await res.json();
+    } else {
+      rawText = await res.text();
     }
-  };
+
+    // ❌ Non-2xx HTTP status
+    if (!res.ok) {
+      setStatus("error");
+      setMessage(
+        data?.message ||
+        data?.error ||
+        `Request failed with status ${res.status}`
+      );
+
+      setDebug({
+        httpStatus: res.status,
+        statusText: res.statusText,
+        responseBody: data ?? rawText,
+      });
+      return;
+    }
+
+    // ✅ Success
+    if (data?.isSuccess) {
+      setStatus("success");
+      setMessage("Your email has been verified. Redirecting to sign in...");
+      setTimeout(() => router.push("/login"), 4000);
+    } else {
+      setStatus("error");
+      setMessage(data?.message || "Verification failed.");
+
+      setDebug({
+        httpStatus: res.status,
+        responseBody: data,
+      });
+    }
+
+  } catch (err: any) {
+    setStatus("error");
+    setMessage("Unexpected error occurred while confirming email.");
+
+    setDebug({
+      name: err?.name,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
 
 
   return (
