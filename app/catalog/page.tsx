@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Footer from "@/src/components/Footer";
 import Navbar from "@/src/components/Navbar";
-import { products } from "@/sampledata/products";
+import { products } from "@/sampledata/products"; // sanple data
 import { useCart } from "@/src/contexts/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CatalogPageSkeleton from "@/src/components/skeletons/CatalogPageSkeleton";

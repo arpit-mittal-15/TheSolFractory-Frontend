@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import type { Product as Productt } from "@/src/types/product";
+import { ProductService } from "@/services/product.service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Product {
@@ -27,6 +29,25 @@ export default function ProductGrid({
   onSortChange,
   onAddToCart,
 }: ProductGridProps) {
+
+  const [productss, setProducts] = useState<Productt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+useEffect(() => {
+  ProductService.getAll()
+    .then((data) => {
+      console.log("Products API response:", data);
+      setProducts(data);
+    })
+    .catch((err) => {
+      console.error("Products API error:", err);
+      setError(err.message);
+    })
+    .finally(() => setLoading(false));
+}, []);
+
+
   return (
     <>
       <div className="flex items-center justify-between mb-11 mt-1">
@@ -45,16 +66,16 @@ export default function ProductGrid({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product) => {
-          const description = `${product.paperType} • ${product.size}`;
+        {productss.map((product) => {
+          const description = `${product.name} • ${product.name}`;
           return (
             <div
-              key={product.id}
+              key={product.productId}
               className="glass-panel rounded-xl overflow-hidden group hover:-translate-y-2 transition-all duration-300"
             >
               <div className="aspect-5/5 not-md:aspect-4/3 bg-white/5 p-6 flex items-center justify-center relative overflow-hidden">
                 <Image
-                  src={product.image}
+                  src={product.imageUrl}
                   alt={product.name}
                   width={200}
                   height={250}
@@ -62,7 +83,7 @@ export default function ProductGrid({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t flex justify-center from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-end p-6">
                   <Button
-                    onClick={() => onAddToCart(product)}
+                    // onClick={() => onAddToCart(product)}
                     className="w-25 btn-liquid active btn-primary py-3 text-[10px] font-bold uppercase tracking-widest"
                   >
                     Add

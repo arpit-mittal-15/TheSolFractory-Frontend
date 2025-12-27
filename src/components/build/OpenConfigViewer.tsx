@@ -7,6 +7,7 @@ import * as THREE from "three";
 import type { CustomizationState, ConeSize, PaperType, FilterType } from "./types";
 import { getProceduralTexture } from "./PaperViewer";
 import { preloadTexture, getCachedTexture } from "@/src/utils/textureCache";
+import { Stars } from "@/src/sharedcomponents/build/stars";
 
 interface OpenConfigViewerProps {
   state: CustomizationState;
@@ -381,7 +382,11 @@ const OpenConfigViewer: React.FC<OpenConfigViewerProps> = ({ state }) => {
   return (
     <div className="relative w-full h-[320px] md:h-[380px] rounded-xl border border-blue-400/40 bg-gradient-to-b from-slate-950 via-black to-slate-950 shadow-[0_0_25px_rgba(15,23,42,0.9)] overflow-hidden">
       <Canvas shadows camera={{ position: [1.7, 1.6, 3.7], fov: 45 }} className="w-full h-full">
-        <color attach="background" args={["#151e45"]} />
+        {/* Pure black background */}
+        <color attach="background" args={["#000000"]} />
+
+        {/* Stars placed before scene lights and content so they appear "behind" */}
+        <Stars count={900} />
         <ambientLight intensity={0.65} />
         <directionalLight
           position={[4, 5, 3]}

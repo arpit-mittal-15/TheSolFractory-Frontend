@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { CustomizationState, PaperType, FilterType } from "./types";
+import { Stars } from "@/src/sharedcomponents/build/stars";
 
 // Color maps
 const paperColorMap: Record<PaperType, string> = {
@@ -360,7 +361,11 @@ export const MergeAnimationViewer: React.FC<MergeAnimationViewerProps> = ({
         camera={{ position: [0, 2, 6], fov: 45 }}
         className="w-full h-full"
       >
-        <color attach="background" args={["#151e45"]} />
+        {/* Pure black background */}
+        <color attach="background" args={["#000000"]} />
+
+        {/* Stars placed before scene lights and content so they appear "behind" */}
+        <Stars count={900} />
         <ambientLight intensity={0.7} />
         <directionalLight
           position={[5, 8, 5]}

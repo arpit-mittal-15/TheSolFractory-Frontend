@@ -1,5 +1,12 @@
 export const products = [
-  { id: "1", name: "Premium Silk Coated Stock", paperType: "Hemp", size: "A4 (210x297mm)", price: 250, image: "/homepage/conestack.png" },
+  { 
+    id: "1", 
+    name: "Premium Silk Coated Stock", 
+    paperType: "Hemp", 
+    size: "A4 (210x297mm)", 
+    price: 250, 
+    image: "/homepage/conestack.png" 
+  },
   { id: "2", name: "Premium Silk Coated Stock", paperType: "Natural", size: "A4 (210x297mm)", price: 210, image: "/homepage/conestack.png" },
   { id: "3", name: "Premium Silk Coated Stock", paperType: "Organic", size: "A4 (210x297mm)", price: 150, image: "/homepage/conestack.png" },
   { id: "4", name: "Premium Silk Coated Stock", paperType: "Rice", size: "A4 (210x297mm)", price: 200, image: "/homepage/conestack.png" },

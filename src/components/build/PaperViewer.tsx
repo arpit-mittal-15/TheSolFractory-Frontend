@@ -6,6 +6,7 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { PaperType } from "./types";
 import { preloadTexture, getCachedTexture } from "@/src/utils/textureCache";
+import { Stars } from "@/src/sharedcomponents/build/stars";
 
 interface PaperViewerProps {
   paperType: PaperType | null;
@@ -338,7 +339,11 @@ const PaperViewer: React.FC<PaperViewerProps> = (props) => {
         camera={{ position: [0.8, 0.8, 3], fov: 45 }}
         className="w-full h-full"
       >
-        <color attach="background" args={["#151e45"]} />
+        {/* Pure black background */}
+        <color attach="background" args={["#000000"]} />
+
+        {/* Stars placed before scene lights and content so they appear "behind" */}
+        <Stars count={900} />
         <ambientLight intensity={0.7} />
         <directionalLight
           position={[3, 4, 2]}
@@ -361,6 +366,22 @@ const PaperViewer: React.FC<PaperViewerProps> = (props) => {
           maxPolarAngle={Math.PI - 0.3}
         />
       </Canvas>
+      <div className="absolute top-5 left-7 flex flex-col gap-2 pointer-events-none">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-[1px] bg-white/40" />
+          <span className="text-[10px] uppercase tracking-[0.5em] text-white/50 font-medium">Precision Crafted</span>
+        </div>
+        <h2 className="text-3xl font-serif italic text-white/95 leading-none">Select Paper</h2>
+        <p className="text-[11px] text-white/30 tracking-wider max-w-[200px]">
+          Hand-selected materials meet high-precision manufacturing.
+        </p>
+      </div>
+
+      <div className="absolute top-5 right-8">
+        <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform duration-500">
+          <div className="w-1 h-1 rounded-full bg-white animate-ping" />
+        </div>
+      </div>
     </div>
   );
 };
