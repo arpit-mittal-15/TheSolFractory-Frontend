@@ -150,7 +150,7 @@ const PaperRoll: React.FC<{ state: CustomizationState; isExpanded: boolean }> = 
   return (
     <group ref={groupRef}>
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.15, 0.15, 0.4, 32]} />
+        <cylinderGeometry args={[0.20, 0.35, 4, 32]} />
         <meshStandardMaterial
           color={baseColor}
           roughness={getPaperRoughness(state.paperType)}
@@ -454,7 +454,7 @@ const BottomPreview: React.FC<BottomPreviewProps> = ({ state, type, onPreviewTog
 
 
 
-      <Canvas camera={{ position: [0, 0, isExpanded ? 1.5 : type === "filter" ? 4.0 : 0.8], fov: isExpanded ? 40 : type === "filter" ? 35 : 50 }} className="w-full h-full" >
+      <Canvas camera={{ position: [0, 0, isExpanded ? 1.5 : type === "filter" ? 4.0 : 4.4], fov: isExpanded ? 40 : type === "filter" ? 35 : 50 }} className="w-full h-full" >
         <color attach="background" args={["transparent"]} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[2, 2, 2]} intensity={1} />

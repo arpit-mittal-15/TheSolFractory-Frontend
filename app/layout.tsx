@@ -29,8 +29,7 @@ export default function RootLayout({
         className={`${manrope.className} antialiased selection:bg-blue-600 selection:text-white`}
       >
         {/* Global liquid glass background – shared across all pages */}
-        <GoogleOAuthProvider
-  clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
 >
             <div className="liquid-canvas">
               <div className="orb orb-1" />

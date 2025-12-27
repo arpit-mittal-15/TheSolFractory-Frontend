@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  IconUser, 
-  IconLock, 
-  IconPhone, 
-  IconMapPin, 
+import {
+  IconUser,
+  IconLock,
+  IconPhone,
+  IconMapPin,
   IconLogout,
   IconEye,
-  IconEyeOff
+  IconEyeOff,
+  IconCreditCard,
 } from "@tabler/icons-react";
 import { useUser } from "@/src/contexts/UserContext";
 import { AuthService } from "@/services/auth.service";
 import { toast } from "sonner";
 
-type TabType = "profile" | "password" | "phone" | "address";
+type TabType = "profile" | "password" | "phone" | "address" | "payment";
 
 export default function ProfilePage() {
   const { user, logout, refreshUserData, isAuthenticated } = useUser();
@@ -46,30 +47,70 @@ export default function ProfilePage() {
     phoneNumber: "",
   });
 
-  // Address form state
+  // Address form state - now structured
   const [addressForm, setAddressForm] = useState({
-    address: "",
+    street: "",
+    city: "",
+    state: "",
+    country: "",
+    pincode: "",
   });
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
+  // Payment form state (we do NOT store raw card numbers/CVV here) - only masked info sent to backend.
+  const [paymentForm, setPaymentForm] = useState({
+    cardHolderName: "",
+    cardNumber: "",
+    expiryMonth: "",
+    expiryYear: "",
+    cvv: "",
+    cardBrand: "",
+    last4: "",
+  });
+
+useEffect(() => {
+  if (!isAuthenticated) {
+    router.push("/login");
+    return;
+  }
+
+  if (user) {
+    setProfileForm({
+      name: user.name || "",
+      email: user.email || "",
+    });
+    setPhoneForm({
+      phoneNumber: user.phoneNumber || "",
+    });
+
+    // Address
+    if (typeof user.address === "string") {
+      // setAddressForm((s) => ({ ...s, street: user.address || "" }));
+    } else if (user.address && typeof user.address === "object") {
+      const address = user.address;
+      setAddressForm({
+        street: address.street || "",
+        city: address.city || "",
+        state: address.state || "",
+        country: address.country || "",
+        pincode: address.pincode || "",
+      });
     }
 
-    if (user) {
-      setProfileForm({
-        name: user.name || "",
-        email: user.email || "",
-      });
-      setPhoneForm({
-        phoneNumber: user.phoneNumber || "",
-      });
-      setAddressForm({
-        address: user.address || "",
-      });
+    // Payment info
+    if (user.paymentInfo && typeof user.paymentInfo === "object") {
+      const payment: any = user.paymentInfo; // <-- store typed variable
+      setPaymentForm((p) => ({
+        ...p,
+        cardHolderName: payment.cardHolderName || "",
+        cardBrand: payment.cardBrand || "",
+        last4: payment.last4 || "",
+        expiryMonth: payment.expiryMonth || "",
+        expiryYear: payment.expiryYear || "",
+      }));
     }
-  }, [user, isAuthenticated, router]);
+  }
+}, [user, isAuthenticated, router]);
+
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,13 +189,76 @@ export default function ProfilePage() {
 
     setIsLoading(true);
     try {
+      // Send structured address object to backend. Make sure your backend schema supports this.
       await AuthService.updateUser(user.id, {
-        address: addressForm.address,
+        address: {
+          street: addressForm.street,
+          city: addressForm.city,
+          state: addressForm.state,
+          country: addressForm.country,
+          pincode: addressForm.pincode,
+        },
       });
       await refreshUserData();
       toast.success("Address updated successfully!");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update address");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Simple card brand detection and last4 extraction — replace with payment provider tokenization in production.
+  const detectCardBrand = (number: string) => {
+    const n = number.replace(/\s+/g, "");
+    if (/^4/.test(n)) return "Visa";
+    if (/^5[1-5]/.test(n)) return "Mastercard";
+    if (/^3[47]/.test(n)) return "American Express";
+    return "Unknown";
+  };
+
+  const handleCardNumberChange = (val: string) => {
+    const sanitized = val.replace(/[^0-9]/g, "");
+    const last4 = sanitized.slice(-4);
+    const brand = detectCardBrand(sanitized);
+    setPaymentForm((p) => ({ ...p, cardNumber: val, last4, cardBrand: brand }));
+  };
+
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    // SECURITY: Do NOT store raw card numbers or CVV in your database. Use a PCI-compliant tokenization flow (Stripe, Braintree, etc.)
+    // Here we only send masked data (brand + last4 + expiry + cardholder) to backend as an example. Replace with tokenization.
+
+    setIsLoading(true);
+    try {
+      const paymentPayload = {
+        cardHolderName: paymentForm.cardHolderName,
+        cardBrand: paymentForm.cardBrand,
+        last4: paymentForm.last4,
+        expiryMonth: paymentForm.expiryMonth,
+        expiryYear: paymentForm.expiryYear,
+        // optionally attach billing address (structured)
+        billingAddress: {
+          street: addressForm.street,
+          city: addressForm.city,
+          state: addressForm.state,
+          country: addressForm.country,
+          pincode: addressForm.pincode,
+        },
+      };
+
+      await AuthService.updateUser(user.id, {
+        paymentInfo: paymentPayload,
+      });
+
+      await refreshUserData();
+      toast.success("Payment info saved (masked). Replace with tokenization in production.");
+      // Clear sensitive local fields (cardNumber/cvv)
+      setPaymentForm((p) => ({ ...p, cardNumber: "", cvv: "" }));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save payment info");
     } finally {
       setIsLoading(false);
     }
@@ -174,6 +278,7 @@ export default function ProfilePage() {
     { id: "password" as TabType, label: "Password", icon: IconLock },
     { id: "phone" as TabType, label: "Phone", icon: IconPhone },
     { id: "address" as TabType, label: "Address", icon: IconMapPin },
+    { id: "payment" as TabType, label: "Payment", icon: IconCreditCard },
   ];
 
   return (
@@ -237,7 +342,7 @@ export default function ProfilePage() {
           {activeTab === "profile" && (
             <form onSubmit={handleProfileSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-white mb-6">Profile Information</h2>
-              
+
               <div>
                 <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">
                   Name
@@ -280,7 +385,7 @@ export default function ProfilePage() {
           {activeTab === "password" && (
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-white mb-6">Change Password</h2>
-              
+
               <div>
                 <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">
                   Current Password
@@ -395,7 +500,7 @@ export default function ProfilePage() {
           {activeTab === "phone" && (
             <form onSubmit={handlePhoneSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-white mb-6">Phone Number</h2>
-              
+
               <div>
                 <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">
                   Phone Number
@@ -419,20 +524,65 @@ export default function ProfilePage() {
             </form>
           )}
 
-          {/* Address Tab */}
+          {/* Address Tab (structured inputs) */}
           {activeTab === "address" && (
             <form onSubmit={handleAddressSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-white mb-6">Address</h2>
-              
+
               <div>
-                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">
-                  Address
-                </label>
-                <textarea
-                  value={addressForm.address}
-                  onChange={(e) => setAddressForm({ address: e.target.value })}
-                  className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60 min-h-[120px] resize-y"
-                  placeholder="Enter your address"
+                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Street</label>
+                <input
+                  type="text"
+                  value={addressForm.street}
+                  onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                  className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                  placeholder="House, building, street address"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">City</label>
+                  <input
+                    type="text"
+                    value={addressForm.city}
+                    onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                    placeholder="City"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">State</label>
+                  <input
+                    type="text"
+                    value={addressForm.state}
+                    onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                    placeholder="State/Province"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Pincode</label>
+                  <input
+                    type="text"
+                    value={addressForm.pincode}
+                    onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value.replace(/[^0-9]/g, "") })}
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                    placeholder="Postal / ZIP code"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Country</label>
+                <input
+                  type="text"
+                  value={addressForm.country}
+                  onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
+                  className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                  placeholder="Country"
                 />
               </div>
 
@@ -445,9 +595,93 @@ export default function ProfilePage() {
               </button>
             </form>
           )}
+
+          {/* Payment Tab */}
+          {activeTab === "payment" && (
+            <form onSubmit={handlePaymentSubmit} className="space-y-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Payment Information</h2>
+
+              <p className="text-xs text-gray-400">We do not store raw card numbers or CVV — use a payment provider tokenization in production.</p>
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Cardholder Name</label>
+                <input
+                  type="text"
+                  value={paymentForm.cardHolderName}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, cardHolderName: e.target.value })}
+                  className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                  placeholder="Name on card"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Card Number</label>
+                <input
+                  type="text"
+                  value={paymentForm.cardNumber}
+                  onChange={(e) => handleCardNumberChange(e.target.value)}
+                  inputMode="numeric"
+                  className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                  placeholder="1234 5678 9012 3456"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Expiry Month</label>
+                  <input
+                    type="text"
+                    value={paymentForm.expiryMonth}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, expiryMonth: e.target.value.replace(/[^0-9]/g, "") })}
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                    placeholder="MM"
+                    maxLength={2}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Expiry Year</label>
+                  <input
+                    type="text"
+                    value={paymentForm.expiryYear}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, expiryYear: e.target.value.replace(/[^0-9]/g, "") })}
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                    placeholder="YY"
+                    maxLength={4}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">CVV</label>
+                  <input
+                    type="password"
+                    value={paymentForm.cvv}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, cvv: e.target.value.replace(/[^0-9]/g, "") })}
+                    className="w-full bg-black/40 border placeholder:text-white/50 border-white/10 rounded-lg p-4 text-sm text-white focus:border-blue-500 outline-none transition focus:bg-black/60"
+                    placeholder="CVV"
+                    maxLength={4}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Card Brand / Last4</label>
+                  <div className="w-full bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white">
+                    {paymentForm.cardBrand} {paymentForm.last4 ? `•${paymentForm.last4}` : ""}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn-liquid active w-full max-w-xs mx-auto flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold uppercase tracking-widest text-gray-300 hover:text-white transition"
+              >
+                {isLoading ? "Saving..." : "Save Payment Info"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

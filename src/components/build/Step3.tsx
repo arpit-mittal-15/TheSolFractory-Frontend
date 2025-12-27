@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, Palette } from "lucide-react";
-import OpenConfigViewer from "./OpenConfigViewer";
+import { MergeAnimationViewer } from "./ConeMergeAnimtaion";
 import { CONE_SIZES, type CustomizationState } from "./types";
 import StepIndicator from "./StepIndicator";
 import BottomPreview from "./BottomPreview";
@@ -23,6 +23,19 @@ const Step3: React.FC<Step3Props> = ({
   prevStep,
   nextStep,
 }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleNext = () => {
+    setIsAnimating(true);
+  };
+
+  const handleAnimationComplete = () => {
+    setTimeout(() => {
+      setIsAnimating(false);
+      nextStep();
+    }, 300);
+  };
+
   // Use only the real CONE_SIZES values; do not fabricate ids.
   const realSizes = CONE_SIZES.slice(0, TOTAL_CARDS);
   const emptySlots = Math.max(0, TOTAL_CARDS - realSizes.length);
@@ -45,15 +58,21 @@ const Step3: React.FC<Step3Props> = ({
 
       {/* Main layout matches Step1 exactly */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-        {/* Left Panel: Viewer */}
+        {/* Left Panel: Animation Viewer */}
         <div className="flex flex-col space-y-4">
           <div className="relative">
             <StepIndicator currentStep={3} />
-            <OpenConfigViewer state={state} />
-            <div className="absolute bottom-4 left-1/6 transform -translate-x-1/2 flex gap-3 items-center z-10">
-              <BottomPreview state={state} type="paper" />
-              <BottomPreview state={state} type="filter" />
-            </div>
+            <MergeAnimationViewer
+              state={state}
+              isAnimating={isAnimating}
+              onAnimationComplete={handleAnimationComplete}
+            />
+            {!isAnimating && (
+              <div className="absolute bottom-4 left-1/6 transform -translate-x-1/2 flex gap-3 items-center z-10">
+                <BottomPreview state={state} type="paper" />
+                <BottomPreview state={state} type="filter" />
+              </div>
+            )}
           </div>
         </div>
 
@@ -72,11 +91,12 @@ const Step3: React.FC<Step3Props> = ({
               <button
                 key={size.id}
                 onClick={() => updateState({ coneSize: size.id })}
+                disabled={isAnimating}
                 className={`relative h-[115px] rounded-lg p-2.5 border transition-all text-left bg-black/40 backdrop-blur-xl glass-panel ${
                   isSelected
                     ? "active border-blue-400 shadow-[0_0_18px_rgba(59,130,246,0.45)]"
                     : "border-gray-700 hover:border-gray-600"
-                }`}
+                } ${isAnimating ? "opacity-50 cursor-not-allowed" : ""}`}
                 type="button"
               >
                 {isSelected && (
@@ -123,6 +143,7 @@ const Step3: React.FC<Step3Props> = ({
               <Button
                 variant="outline"
                 onClick={prevStep}
+                disabled={isAnimating}
                 className="btn-glass-panel ml-[2%] cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ArrowLeft className="mr-1 h-4 w-4" />
@@ -130,11 +151,11 @@ const Step3: React.FC<Step3Props> = ({
               </Button>
 
               <Button
-                onClick={nextStep}
-                disabled={!state.coneSize}
+                onClick={handleNext}
+                disabled={!state.coneSize || isAnimating}
                 className="btn-glass-panel ml-[2%] not-md:ml-[10%] cursor-pointer w-30 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                NEXT
+                {isAnimating ? "Merging..." : "NEXT"}
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </div>

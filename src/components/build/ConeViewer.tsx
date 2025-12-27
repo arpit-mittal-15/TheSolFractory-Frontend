@@ -204,9 +204,9 @@ const ConeMesh: React.FC<ConeViewerProps> = ({ state, focusStep }) => {
   // cone dimensions (keep fixed as per previous requirement)
   const coneDimensions = useMemo(() => {
     return {
-      topRadius: 0.22,
+      topRadius: 0.18,
       bottomRadius: 0.12,
-      height: 2.4,
+      height: 2.8,
     };
   }, []);
 
