@@ -1,4 +1,4 @@
-const BASE_URL = "https://solfrance-etcuddebbvawcdeh.canadacentral-01.azurewebsites.net";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Get auth token from localStorage or window
 function getAuthToken(): string | null {
