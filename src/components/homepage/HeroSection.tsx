@@ -13,7 +13,7 @@ const HeroSection: React.FC = () => {
   if(isMobile) return <MobileHeroSection />
 
   return (
-    <section className="hero-section text-white py-23 px-6 text-center">
+    <section className="hero-section text-white py-0 pb-22 pt-3 px-6 text-center">
       <h1 className="text-4xl md:text-5xl font-w-[400px] leading-[1.35] md:leading-[1.4]">
         <span>
           We Don’t Just <span className="text-[#98BFF5]">Make Cones</span>

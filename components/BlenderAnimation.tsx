@@ -111,7 +111,7 @@ export default function BlenderViewer({
         {/* Simple lighting — adjust or add as needed */}
         <ambientLight intensity={0.6} />
         <directionalLight position={[10, 10, 10]} intensity={0.9} />
-        <hemisphereLight skyColor={0xffffff} groundColor={0x444444} intensity={0.3} />
+        <hemisphereLight groundColor={0x444444} intensity={0.3} />
 
         <Suspense fallback={<Html center>Loading model…</Html>}>
           <Model src={src} />

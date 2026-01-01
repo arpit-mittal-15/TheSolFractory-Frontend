@@ -34,7 +34,9 @@ export default function Navbar() {
 
   return (
     <>
-      {/*border-b bg-[#132135]/80*/} <header className="fixed w-full z-50 border-white/5  backdrop-blur-xl transition-all duration-300">
+      {/*border-b bg-[#132135]/80*/} 
+      <header className="w-full border-white/5 backdrop-blur-xl transition-all duration-300">
+
         <div className="max-w-350 mx-auto px-4 md:px-6 h-20 flex justify-between items-center relative z-50">
           <div className="flex items-center gap-3">
             <Link href="/" className="h-10 md:h-14 block group cursor-pointer ml-3">

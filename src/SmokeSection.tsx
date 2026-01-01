@@ -1,19 +1,47 @@
 // components/SmokeSection.jsx
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
+import { SmokeMergeAnimationViewer } from "@/src/components/build/SmokeMergeAnimation";
 
-export default function SmokeSection({ particleCount = 150 }) {
+type ParticleUserData = {
+  baseX: number;
+  baseY: number;
+  baseZ: number;
+  seed: number;
+  baseScale: number;
+  wavePhase: number;
+  waveAmplitude: number;
+  waveFrequency: number;
+};
+
+type SmokeState = {
+  renderer: THREE.WebGLRenderer | null;
+  scene: THREE.Scene | null;
+  camera: THREE.PerspectiveCamera | null;
+  smokeParticles: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>[];
+  material: THREE.MeshLambertMaterial | null;
+  animId: number | null;
+  lastScrollY: number;
+  scrollProgress: number;
+  vacuum: number;
+  opacity: number;
+  sectionOffsetTop: number;
+};
+
+export default function SmokeSection({ particleCount = 120 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const spacerBeforeRef = useRef<HTMLDivElement>(null);
-  const stateRef = useRef({
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [bgOpacity, setBgOpacity] = useState(0);
+  const stateRef = useRef<SmokeState>({
     renderer: null,
     scene: null,
     camera: null,
-    smokeParticles: [],
+    smokeParticles: [] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>[],
     material: null,
     animId: null,
     lastScrollY: 0,
@@ -58,14 +86,14 @@ export default function SmokeSection({ particleCount = 150 }) {
     const smokeMaterial = new THREE.MeshLambertMaterial({
       map: loader.load(smokeURL),
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.75,
       depthWrite: false,
       blending: THREE.NormalBlending,
       color: new THREE.Color(0xFFFFFF),
     });
 
     const smokeGeo = new THREE.PlaneGeometry(300, 300);
-    const smokeParticles = [];
+    const smokeParticles: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>[] = [];
 
     // Particle initial positions distributed across screen for wavy effect
     // We'll store base positions on the mesh.userData for deterministic movement.
@@ -75,12 +103,12 @@ export default function SmokeSection({ particleCount = 150 }) {
       const m = new THREE.Mesh(smokeGeo, smokeMaterial);
       // Distribute particles starting from left side
       // When particleProgress=1, they'll be at baseX + 1500, which centers them around 0
-      const x = -1500 + (i / particleCount) * 1000; // start from -1500 to -500
-      const y = (Math.random() - 0.5) * window.innerHeight * 1.5;
+      const x = -1200 + (i / particleCount) * 900; // start from -1200 to -300
+      const y = (Math.random() - 0.5) * window.innerHeight * 1.1;
       const z = (Math.random() - 0.5) * 1000;
       m.position.set(x, y, z);
       m.rotation.z = Math.random() * Math.PI * 2;
-      const scl = 0.8 + Math.random() * 2.2;
+      const scl = 0.7 + Math.random() * 1.3;
       m.scale.setScalar(scl);
       m.userData = {
         baseX: x,
@@ -89,9 +117,9 @@ export default function SmokeSection({ particleCount = 150 }) {
         seed: Math.random(),
         baseScale: scl,
         wavePhase: Math.random() * Math.PI * 2, // phase for wavy movement
-        waveAmplitude: 50 + Math.random() * 100, // amplitude for wavy movement
-        waveFrequency: 0.5 + Math.random() * 1.5, // frequency for wavy movement
-      };
+        waveAmplitude: 30 + Math.random() * 60, // amplitude for wavy movement
+        waveFrequency: 0.45 + Math.random() * 0.95, // frequency for wavy movement
+      } as ParticleUserData;
       scene.add(m);
       smokeParticles.push(m);
     }
@@ -116,7 +144,7 @@ export default function SmokeSection({ particleCount = 150 }) {
     // Scroll mapping
     // We'll compute `progress` (0..1) when the section crosses the viewport.
     function computeProgress() {
-      if (!spacerBeforeRef.current) return { progress: 0, opacity: 0 };
+      if (!spacerBeforeRef.current) return { progress: 0, opacity: 0, bgOpacity: 0 };
       
       // Get the position of the spacer before the section (which represents where section starts in scroll)
       const spacerRect = spacerBeforeRef.current.getBoundingClientRect();
@@ -124,9 +152,9 @@ export default function SmokeSection({ particleCount = 150 }) {
       const scrollY = window.scrollY;
       
       // Calculate the section's position in document flow
-      // Extended section: 100vh for fade in + 200vh for holding full screen + 100vh for fade out = 400vh total
+      // Reduced section: fade in + hold + fade out - end before footer but keep visible longer
       const sectionTop = spacerRect.top + scrollY;
-      const sectionHeight = h * 4; // 4 viewport heights total
+      const sectionHeight = h * 2.4; // slower scroll progression across the smoke section
       const sectionBottom = sectionTop + sectionHeight;
       
       // Calculate progress based on scroll position relative to section
@@ -136,53 +164,66 @@ export default function SmokeSection({ particleCount = 150 }) {
       let progress = (viewportTop - sectionTop) / sectionHeight;
       progress = Math.max(0, Math.min(1, progress));
       
-      // Calculate opacity with extended full-screen period:
-      // - Fade in: progress 0->0.25 (first 25% = 1vh)
-      // - Full opacity: progress 0.25->0.75 (middle 50% = 2vh - this is the "2 extra scrolls")
-      // - Fade out: progress 0.75->1 (last 25% = 1vh)
+      // Calculate opacity - keep visible longer but still zero before footer:
+      // - Fade in: progress 0->0.12 (first 12%)
+      // - Full opacity: progress 0.12->0.45 (middle 33%)
+      // - Fade out: progress 0.45->0.70 (25% fade out)
+      // - FORCE HIDDEN: progress > 0.70 (last 30% = buffer before footer)
       let opacity = 0;
-      if (progress < 0.2) {
-        // Fade in slowly when arriving (first viewport)
-        opacity = progress / 0.2;
-      } else if (progress < 0.5) {
-        // Full opacity - hold for 2 extra scrolls (middle 2 viewports)
+      let bgOpacityVal = 0;
+      if (progress < 0.12) {
+        opacity = progress / 0.12;
+        bgOpacityVal = progress / 0.12;
+      } else if (progress < 0.45) {
         opacity = 1;
+        bgOpacityVal = 1;
+      } else if (progress < 0.70) {
+        opacity = Math.max(0, 1 - (progress - 0.45) / 0.25);
+        bgOpacityVal = 1; // keep background black while smoke fades
       } else {
-        // Fade out slowly when scrolling past (last viewport)
-        opacity = 1 - (progress - 0.5) / 0.5;
+        opacity = 0;
+        bgOpacityVal = 1; // keep background black after smoke finishes; will revert when scrolling upward
       }
       
-      // Hide navbar when smoke is visible (opacity > 0.1)
-      if (opacity > 0.1) {
-        document.body.classList.add('smoke-active');
-      } else {
-        document.body.classList.remove('smoke-active');
-      }
-      
-      return { progress, opacity };
+      return { progress, opacity, bgOpacity: bgOpacityVal };
     }
 
-    let scrollTimeout = null;
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
     function onScroll() {
       const cur = window.scrollY;
-      const dirDown = cur > stateRef.current.lastScrollY;
       stateRef.current.lastScrollY = cur;
 
-      const { progress, opacity } = computeProgress();
+      const { progress, opacity, bgOpacity: bgOpacityCalc } = computeProgress();
+      
+      // Decide animation visibility on latest opacity/progress snapshot
+      if (opacity > 0.8 && progress >= 0.12 && progress <= 0.45) {
+        setShowAnimation(true);
+      } else {
+        setShowAnimation(false);
+      }
+
+      // Drive a single source of truth for opacity
+      const clampedOpacity = Math.max(0, opacity);
+      const clampedBg = Math.max(0, bgOpacityCalc);
+      setBgOpacity(clampedBg);
       
       // Smooth tween to new scrollProgress and opacity (gsap for polish)
       gsap.to(stateRef.current, {
-        duration: 0.6,
+        duration: 0.2,
         scrollProgress: progress,
-        opacity: opacity,
+        opacity: clampedOpacity,
         ease: "power2.out",
-      });
-
-      // Update material opacity based on computed opacity
-      gsap.to(smokeMaterial, {
-        duration: 0.8,
-        opacity: opacity * 0.9, // multiply by base opacity
-        ease: "power2.out",
+        onUpdate: () => {
+          // During tween, keep material and section in sync
+          const finalOpacity = Math.max(0, stateRef.current.opacity);
+          smokeMaterial.opacity = finalOpacity * 0.9;
+          if (sectionRef.current) {
+            sectionRef.current.style.opacity = finalOpacity.toString();
+            sectionRef.current.style.visibility = finalOpacity > 0.01 ? "visible" : "hidden";
+            sectionRef.current.style.display = finalOpacity > 0.01 ? "block" : "none";
+            sectionRef.current.style.zIndex = finalOpacity > 0.01 ? "40" : "-999";
+          }
+        },
       });
 
       // If scrolling up, enable vacuum a bit, else reduce vacuum.
@@ -195,7 +236,7 @@ export default function SmokeSection({ particleCount = 150 }) {
     //   }
 
       // small debounce to force vacuum off if user stops
-      clearTimeout(scrollTimeout);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         // when user stops scrolling, leak vacuum back to 0 slowly
         gsap.to(stateRef.current, { duration: 1.2, vacuum: 0, ease: "power2.out" });
@@ -205,7 +246,7 @@ export default function SmokeSection({ particleCount = 150 }) {
 
     // animation loop
     let prevTime = performance.now();
-    function animate(now) {
+    function animate(now: number) {
       const dt = (now - prevTime) / 1000;
       prevTime = now;
 
@@ -215,31 +256,39 @@ export default function SmokeSection({ particleCount = 150 }) {
       const vac = s.vacuum; // 0..1
       const opacity = s.opacity; // 0..1
 
-      // Map progress to particle movement progress:
-      // - During fade in (0->0.25): particles move from left to center (0->1)
-      // - During hold (0.25->0.75): particles stay at center (1)
-      // - During fade out (0.75->1): particles move from center to right (1->0, but we want them to stay visible)
+      // Skip rendering if completely hidden (optimization + ensures no fog on footer)
+      if (opacity <= 0) {
+        // Hide all particles
+        particles.forEach(p => p.visible = false);
+        renderer.render(scene, camera);
+        s.animId = requestAnimationFrame(animate);
+        return;
+      }
+      
+      // Keep particles centered once fully visible (no slide-off to the right)
+      // Fade in only until progress ~0.25, then stay put; opacity is handled separately.
       let particleProgress = 0;
       if (prog < 0.25) {
         // Fade in: particles move into view
         particleProgress = prog / 0.25; // 0 -> 1
-      } else if (prog < 0.75) {
-        // Hold period: particles stay at full position
-        particleProgress = 1;
       } else {
-        // Fade out: particles can move slightly but stay mostly visible
-        particleProgress = 1 - (prog - 0.75) * 0.5; // 1 -> 0.5 (so they don't disappear completely)
+        // Hold: stay centered for the rest of the section
+        particleProgress = 1;
       }
 
       // parameters
-      const travel = 1500; // how far particles travel to the right when progress=1
-      // With baseX from -1500 to -500, and travel=1500, final positions will be 0 to 1000
+      const travel = 1200; // how far particles travel when progress=1
+      // With baseX from -1200 to -300, and travel=1200, final positions will be roughly -300 to 900
       // This centers particles on screen when particleProgress=1
-      const rotSpeed = 0.15;
+      const rotSpeed = 0.08;
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        const u = p.userData;
+        const u = p.userData as ParticleUserData;
+        
+        // Ensure particle is visible when there's opacity
+        p.visible = true;
+        
         // time-based for wavy movement
         const t = now * 0.0008 + u.seed * 10;
         
@@ -261,8 +310,8 @@ export default function SmokeSection({ particleCount = 150 }) {
         p.position.x += (finalX - p.position.x) * (0.1 + particleProgress * 0.06);
 
         // Wavy vertical movement - sine waves for up/down wavy motion
-        const verticalWave1 = Math.sin(t * 0.8 + u.seed * 5) * (60 + u.seed * 80);
-        const verticalWave2 = Math.cos(t * 0.6 + u.seed * 7) * (40 + u.seed * 60);
+        const verticalWave1 = Math.sin(t * 0.8 + u.seed * 5) * (40 + u.seed * 50);
+        const verticalWave2 = Math.cos(t * 0.6 + u.seed * 7) * (30 + u.seed * 40);
         const verticalOffset = verticalWave1 + verticalWave2;
         // During hold period, keep particles centered vertically
         const verticalProg = particleProgress;
@@ -270,7 +319,7 @@ export default function SmokeSection({ particleCount = 150 }) {
         p.position.y += (ty - p.position.y) * 0.07;
 
         // z nudging with wavy pattern for depth
-        const zWave = Math.sin(t * 0.5 + u.seed * 3) * 150;
+        const zWave = Math.sin(t * 0.5 + u.seed * 3) * 110;
         // During hold period, keep particles at good depth
         const zProg = particleProgress;
         const tz = u.baseZ + (zProg - 0.5) * 250 + zWave;
@@ -280,8 +329,8 @@ export default function SmokeSection({ particleCount = 150 }) {
         p.rotation.z += rotSpeed * dt * (0.5 + u.seed * 0.5);
         
         // Scale based on particle progress and opacity
-        const targetScale = u.baseScale * (0.8 + particleProgress * 1.8 - vac * 0.8) * (0.7 + opacity * 0.3);
-        p.scale.x += (targetScale - p.scale.x) * 0.07;
+        const targetScale = u.baseScale * (0.75 + particleProgress * 1.5 - vac * 0.6) * (0.7 + opacity * 0.3);
+        p.scale.x += (targetScale - p.scale.x) * 0.06;
         p.scale.y = p.scale.x;
       }
 
@@ -304,7 +353,7 @@ export default function SmokeSection({ particleCount = 150 }) {
     return () => {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onScroll);
-      clearTimeout(scrollTimeout);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
       if (stateRef.current.animId) cancelAnimationFrame(stateRef.current.animId);
       // dispose three resources
       smokeParticles.forEach((m) => {
@@ -330,11 +379,15 @@ export default function SmokeSection({ particleCount = 150 }) {
           position: "fixed",
           top: 0,
           left: 0,
-          width: "100%",
+          width: "100vw",
           height: "100vh",
           overflow: "hidden",
           pointerEvents: "none",
-          zIndex: 40,
+          zIndex: bgOpacity > 0.01 ? 40 : -999,
+          background: `rgba(0,0,0,${Math.max(0, bgOpacity)})`,
+          opacity: Math.max(0, bgOpacity),
+          visibility: bgOpacity > 0.01 ? "visible" : "hidden",
+          display: bgOpacity > 0.01 ? "block" : "none",
         }}
       >
         {/* Canvas container */}
@@ -346,24 +399,13 @@ export default function SmokeSection({ particleCount = 150 }) {
             height: "100%",
           }}
         />
-        {/* overlay content (optional) */}
-        <div
-          style={{
-            position: "absolute",
-            zIndex: 10,
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            // Do not block page interactions
-            pointerEvents: "none",
-          }}
-        >
-        </div>
+        {/* Merge Animation Overlay */}
+        <SmokeMergeAnimationViewer 
+          isVisible={showAnimation}
+        />
       </section>
-      {/* Extended spacer to maintain scroll position for 2 extra scrolls (3vh total: 1vh before + 2vh extra) */}
-      <div style={{ height: "300vh" }} />
+      {/* Spacer to ensure footer stays clear even with slower smoke progression */}
+      <div style={{ height: "120vh" }} />
     </>
   );
 }
