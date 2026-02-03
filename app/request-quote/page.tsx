@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "@/src/components/Navbar";
-import Footer from "@/src/components/Footer";
+import Navbar from "@/src/components/global/Navbar";
+import Footer from "@/src/components/global/Footer";
 
 export default function RequestQuotePage() {
   const [form, setForm] = useState({

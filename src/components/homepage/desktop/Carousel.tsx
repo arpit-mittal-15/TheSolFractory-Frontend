@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import MobileCarousel from "../mobile/MobileCarousel";
-import FullPageLoader from "@/src/components/FullPageLoader";
+import FullPageLoader from "@/src/components/global/FullPageLoader";
 
 interface CardItem {
   image: string;

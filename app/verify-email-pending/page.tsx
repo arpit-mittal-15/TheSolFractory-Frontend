@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import Footer from "@/src/components/Footer";
+import Footer from "@/src/components/global/Footer";
 import Link from "next/link";
 
 export default function VerifyEmailPendingPage() {

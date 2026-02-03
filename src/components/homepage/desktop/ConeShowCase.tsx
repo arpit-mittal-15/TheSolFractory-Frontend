@@ -1,7 +1,7 @@
 'use client'
 import InfoCard from "@/src/sharedcomponents/InfoCard";
 import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
+import FullPageLoader from "@/src/components/global/FullPageLoader";
 
 export default function MergedCards() {
 

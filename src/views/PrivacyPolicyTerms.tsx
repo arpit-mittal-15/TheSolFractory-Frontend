@@ -1,15 +1,7 @@
 "use client";
 
-import Navbar from "@/src/components/Navbar";
-import Footer from "@/src/components/Footer";
-
-/*
-  You can split these into two separate files if you want:
-  - PrivacyPolicyPage.tsx
-  - TermsOfServicePage.tsx
-
-  For now, both components are provided in one file for clarity.
-*/
+import Navbar from "@/src/components/global/Navbar";
+import Footer from "@/src/components/global/Footer";
 
 export function PrivacyPolicyPage() {
   return (

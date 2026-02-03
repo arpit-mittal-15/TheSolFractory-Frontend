@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { AnimatedPinCard } from "@/src/sharedcomponents/PinCard3D";
 import MobileTrustCones from "../mobile/MobileTrustCones";
 import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
+import FullPageLoader from "@/src/components/global/FullPageLoader";
 
 const features = [
   {

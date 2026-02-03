@@ -4,7 +4,7 @@ import { UserProvider } from "@/src/contexts/UserContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "@/components/ui/sonner";
 import { Manrope } from "next/font/google";
-import { WhatsappFab } from "@/src/components/WhatsappFab";
+import { WhatsappFab } from "@/src/components/global/WhatsappFab";
 
 const manrope = Manrope({
   subsets: ["latin"],

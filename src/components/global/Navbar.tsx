@@ -8,7 +8,7 @@ import { ShoppingCartDialog } from "@/components/ShoppingCartDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/src/contexts/CartContext";
 import { useUser } from "@/src/contexts/UserContext";
-import { UserProfileDialog } from "@/src/components/UserProfileDialog";
+import { UserProfileDialog } from "@/src/components/user/UserProfileDialog";
 
 const navLinks = [
   { id: "home", label: "Home", href: "/" },

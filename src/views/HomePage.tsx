@@ -4,12 +4,12 @@ import SolFactoryAdvantage from '@/src/components/homepage/desktop/SolFactoryAdv
 import MergedCards from '@/src/components/homepage/desktop/ConeShowCase'
 import TrustConesSection from '@/src/components/homepage/desktop/TrustConesSection'
 import Carousel from '@/src/components/homepage/desktop/Carousel'
-import BlenderAnimation from "@/components/BlenderAnimation"
-import dynamic from 'next/dynamic';
-import SmokeSection from '../testcomponents/SmokeSection'
-import { MergeAnimationViewer } from '../components/build/ConeMergeAnimtaion'
-import FullScreenSmoke from '../testcomponents/FullScreenSmoke'
-import SmokeOverlayText from '../testcomponents/SmokeOverlayText'
+// import BlenderAnimation from "@/components/BlenderAnimation"
+// import dynamic from 'next/dynamic';
+// import SmokeSection from '../testcomponents/SmokeSection'
+// import { MergeAnimationViewer } from '../components/build/ConeMergeAnimtaion'
+// import FullScreenSmoke from '../testcomponents/FullScreenSmoke'
+// import SmokeOverlayText from '../testcomponents/SmokeOverlayText'
 
 export default function HomePage() {
   return (

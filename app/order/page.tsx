@@ -1,7 +1,7 @@
 "use client";
 
-import Navbar from "@/src/components/Navbar";
-import Footer from "@/src/components/Footer";
+import Navbar from "@/src/components/global/Navbar";
+import Footer from "@/src/components/global/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

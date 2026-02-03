@@ -1,5 +1,5 @@
-import Footer from '@/src/components/Footer'
-import Navbar from '@/src/components/Navbar'
+import Footer from '@/src/components/global/Footer'
+import Navbar from '@/src/components/global/Navbar'
 import SignupPage from '@/src/views/SignupPage'
 import React from 'react'
 

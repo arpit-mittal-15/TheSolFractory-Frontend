@@ -5,7 +5,7 @@ import { GlowingEffect } from "@/components/ui/glowing-effect";
 import MobileSolFactoryAdvantage from "../mobile/MobileSolFactoryAdvantage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { IconLeaf, IconBrain, IconBuilding, IconHeartHandshake  } from '@tabler/icons-react';
-import FullPageLoader from "@/src/components/FullPageLoader";
+import FullPageLoader from "@/src/components/global/FullPageLoader";
 
 export default function SolFactoryAdvantage() {
 

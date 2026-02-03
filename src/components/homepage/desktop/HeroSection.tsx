@@ -2,7 +2,7 @@
 import React from 'react';
 import MobileHeroSection from '../mobile/MobileHeroSection';
 import { useIsMobile } from "@/hooks/use-mobile";
-import FullPageLoader from "@/src/components/FullPageLoader";
+import FullPageLoader from "@/src/components/global/FullPageLoader";
 
 const HeroSection: React.FC = () => {
 
