@@ -21,9 +21,9 @@ export default function HomePage() {
     <div className=''> {/* cursor-cone */}
         {/* Hero Section */}
         <VideoHero />
-        {/* <ScrollVideo videoSrc="https://cdn.prod.website-files.com/669a4a15cba8630cdb7be146%2F67501efec65b03f2a154ff47_altM%20Final-transcode.mp4" /> */}
-    {/* <ScrollVideo videoSrc="/videos/hero-machinery.mp4" /> */}
-        <ScrollVideo videoSrc="/videos/slowsmoke.mp4" />
+        <ScrollVideo videoSrc="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/output-scroll1.mp4" />
+        {/* <ScrollVideo videoSrc="/videos/hero-machinery.mp4" /> */}
+        {/* <ScrollVideo videoSrc="/videos/slowsmoke.mp4" /> */}
         <HeroSection />
         <Carousel />
         {/* <BlenderAnimation /> */}

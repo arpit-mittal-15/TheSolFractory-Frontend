@@ -72,7 +72,7 @@ export default function Navbar() {
     <>
       {/*border-b bg-[#132135]/80*/} 
       {/* fixed */}
-       <header className={`top-0 left-0 right-0 z-50 w-full border-white/5 transition-all duration-300 ${
+       <header className={`fixed top-0 left-0 right-0 z-50 w-full border-white/5 transition-all duration-300 ${
          (!isOverlappingVideo || !isHomePage) ? "backdrop-blur-xl" : ""
        }`}>
 
