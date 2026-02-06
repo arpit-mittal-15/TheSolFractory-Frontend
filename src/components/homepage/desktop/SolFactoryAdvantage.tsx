@@ -4,27 +4,34 @@ import React from "react";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 import MobileSolFactoryAdvantage from "../mobile/MobileSolFactoryAdvantage";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { IconLeaf, IconBrain, IconBuilding, IconHeartHandshake  } from '@tabler/icons-react';
+import {
+  IconLeaf,
+  IconBrain,
+  IconBuilding,
+  IconHeartHandshake,
+} from "@tabler/icons-react";
 import FullPageLoader from "@/src/components/global/FullPageLoader";
 
 export default function SolFactoryAdvantage() {
+  const isMobile = useIsMobile();
 
-    const isMobile = useIsMobile();
+  if (isMobile === null) return <FullPageLoader />;
 
-    if(isMobile === null) return <FullPageLoader />;
-  
-    if(isMobile) return <MobileSolFactoryAdvantage />
+  if (isMobile) return <MobileSolFactoryAdvantage />;
 
   return (
-    <section className="w-full py-14 px-6 flex flex-col items-center">
-
+    // relative z-10 bg-[#001574]
+    <section className="w-full py-14 px-6 mt-3 flex flex-col items-center">
       {/* TITLE */}
-      <h2 className="text-white text-3xl md:text-[33px] font-w-[400px] text-center mb-15" style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}>
+      <h2
+        className="text-white text-3xl md:text-[33px] font-w-[400px] text-center mb-15"
+        style={{ textShadow: "0 0 3px rgba(255,255,255,0.6)" }}
+      >
         The SOL Factory Advantage
       </h2>
 
       {/* VIDEO FULL WIDTH */}
-      <div className="w-full max-w-7xl flex justify-center mb-14">
+      {/* <div className="w-full max-w-7xl flex justify-center mb-14">
         <div className="w-full rounded-2xl aspect-22/5 flex items-center justify-center">
           <video
             controls
@@ -32,65 +39,64 @@ export default function SolFactoryAdvantage() {
             src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/SOL%20Video%28Compressed%29.mp4"
           />
         </div>
-      </div>
-
+      </div> */}
 
       {/* 4 CARDS GRID */}
-      <div className="
+      <div
+        className="
         max-w-7xl 
         w-full 
         grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 
         gap-8
-      ">
-<CardGlowWrapper>
-  <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
-    <IconLeaf />
-    <span>Premium Quality</span>
-  </h3>
-  <p className="text-sm text-white/70 leading-relaxed">
-    Machine-made cones crafted with food-grade materials and strict QC 
-    for smooth packing and even burns.
-  </p>
-</CardGlowWrapper>
+      "
+      >
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
+            <IconLeaf />
+            <span>Premium Quality</span>
+          </h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Machine-made cones crafted with food-grade materials and strict QC
+            for smooth packing and even burns.
+          </p>
+        </CardGlowWrapper>
 
-<CardGlowWrapper>
-  <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
-    <IconBrain />
-    <span>White-Label Experts</span>
-  </h3>
-  <p className="text-sm text-white/70 leading-relaxed">
-    Custom sizes, branded filters, and packaging tailored 
-    to your product line.
-  </p>
-</CardGlowWrapper>
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
+            <IconBrain />
+            <span>White-Label Experts</span>
+          </h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Custom sizes, branded filters, and packaging tailored to your
+            product line.
+          </p>
+        </CardGlowWrapper>
 
-<CardGlowWrapper>
-  <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
-    <IconBuilding stroke={2} size={25} />
-    <span>Built for Scale</span>
-  </h3>
-  <p className="text-sm text-white/70 leading-relaxed">
-    Fully compatible with top filling machines—perfect for 
-    high-volume production.
-  </p>
-</CardGlowWrapper>
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
+            <IconBuilding stroke={2} size={25} />
+            <span>Built for Scale</span>
+          </h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Fully compatible with top filling machines—perfect for high-volume
+            production.
+          </p>
+        </CardGlowWrapper>
 
-<CardGlowWrapper>
-  <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
-    <IconHeartHandshake stroke={2} />
-    <span>Full Support</span>
-  </h3>
-  <p className="text-sm text-white/70 leading-relaxed">
-    From design to delivery, we handle every step for a seamless 
-    manufacturing experience.
-  </p>
-</CardGlowWrapper>
-
+        <CardGlowWrapper>
+          <h3 className="font-semibold text-lg mb-2 text-white flex items-center gap-3">
+            <IconHeartHandshake stroke={2} />
+            <span>Full Support</span>
+          </h3>
+          <p className="text-sm text-white/70 leading-relaxed">
+            From design to delivery, we handle every step for a seamless
+            manufacturing experience.
+          </p>
+        </CardGlowWrapper>
       </div>
     </section>
   );
 }
-
 
 /* Reusable Glow Wrapper */
 const CardGlowWrapper = ({ children }: { children: React.ReactNode }) => {

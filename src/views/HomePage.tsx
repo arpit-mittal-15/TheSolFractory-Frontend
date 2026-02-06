@@ -10,6 +10,7 @@ import VideoHero from '../components/homepage/desktop/VideoHero'
 import SmokeSection from '../testcomponents/SmokeSection'
 import ScrollVideo from '../components/homepage/desktop/ScrollVideo'
 import MachinerySection from '../components/homepage/desktop/MachinerySection'
+import FullScreenColor from '../components/homepage/desktop/FullScreenColor'
 // import { MergeAnimationViewer } from '../components/build/ConeMergeAnimtaion'
 // import FullScreenSmoke from '../testcomponents/FullScreenSmoke'
 // import SmokeOverlayText from '../testcomponents/SmokeOverlayText'
@@ -19,30 +20,35 @@ import MachinerySection from '../components/homepage/desktop/MachinerySection'
 
 export default function HomePage() {
   return (
-    <div className=''> {/* cursor-cone */}
+    <div className='relative '> {/* cursor-cone */}
         {/* Hero Section */}
         <VideoHero />
-        <ScrollVideo videoSrc="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/outpukh1.mp4" />
-        {/* <ScrollVideo videoSrc="/videos/outpukh1.mp4" /> */}
+        {/* <FullScreenColor /> */}
+        {/* <ScrollVideo videoSrc="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/outpukh1.mp4" /> */}
+        {/* <FullScreenColor /> */}
         {/* <HeroSection /> */}
-        <Carousel />
-        {/* <BlenderAnimation /> */}
-        <SolFactoryAdvantage />
-        <MergedCards />
-        <MachinerySection />
-        {/* <AnimatedCards /> */}
-        <TrustConesSection />
-        {/* <SmokeOverlayText
-          heading="Enter the Unknown"
-          paragraph="A cinematic, immersive experience powered by Three.js smoke particles."
-        /> */}
+        <main className="relative z-10 bg-[#001534]">
+        {/* <main className="relative z-10 bg-[#001534]/80 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(15,23,42,0.9)]"> */}
+        <ScrollVideo videoSrc="/videos/outrobin2.mp4" />
+            {/* <Carousel /> */}
+            {/* <BlenderAnimation /> */}
+            <SolFactoryAdvantage />
+            <MergedCards />
+            <MachinerySection />
+            {/* <AnimatedCards /> */}
+            <TrustConesSection />
+            {/* <SmokeOverlayText
+              heading="Enter the Unknown"
+              paragraph="A cinematic, immersive experience powered by Three.js smoke particles."
+            /> */}
 
-        {/* <SmokeSection /> */}
+            {/* <SmokeSection /> */}
 
-        {/* <FullScreenSmoke
-        heading="Enter the Unknown"
-        paragraph="A cinematic, immersive experience powered by Three.js smoke particles."
-      /> */}
+            {/* <FullScreenSmoke
+            heading="Enter the Unknown"
+            paragraph="A cinematic, immersive experience powered by Three.js smoke particles."
+          /> */}
+      </main>
     </div>
   )
 }

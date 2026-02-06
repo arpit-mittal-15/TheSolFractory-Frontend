@@ -43,6 +43,7 @@ export default function Carousel() {
   }
 
   return (
+    // relative z-10 bg-[#001574] 
     <section className="w-full flex flex-col items-center py-1 mt-57.5">
       <div className="relative mt-5 w-full max-w-5xl h-112.5 flex justify-center items-center overflow-visible">
         {[0, 1, 2, 3, 4].map((pos) => {

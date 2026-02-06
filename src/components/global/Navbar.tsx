@@ -97,8 +97,9 @@ export default function Navbar() {
               <Link
                 key={link.id}
                 href={link.href}
+                // text-[#36363694]
                 className={` ${(!isOverlappingVideo || !isHomePage) ? "nav-btn btn-liquid" : ""} px-6 py-2 w-[120px] text-center text-xs font-bold uppercase tracking-widest
-                   text-[#36363694] drop-shadow-lg hover:text-[#111111cf] hover:active ${
+                    text-white drop-shadow-lg hover:text-[#ffffff71] hover:active ${
                   isActive(link.href) ? "active" : ""
                 }`}
                 onMouseEnter={
