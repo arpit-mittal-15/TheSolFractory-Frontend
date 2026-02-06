@@ -53,7 +53,7 @@ export default function Navbar() {
       // VideoHero is h-screen, so check if scroll is less than viewport height
       const scrollY = window.scrollY;
       const viewportHeight = window.innerHeight;
-      setIsOverlappingVideo(scrollY < viewportHeight);
+      setIsOverlappingVideo(scrollY < viewportHeight * 3.7);
     };
 
     // Check initial state
@@ -72,8 +72,8 @@ export default function Navbar() {
     <>
       {/*border-b bg-[#132135]/80*/} 
       {/* fixed */}
-       <header className={`fixed top-0 left-0 right-0 z-50 w-full border-white/5 transition-all duration-300 ${
-         (!isOverlappingVideo || !isHomePage) ? "backdrop-blur-xl" : ""
+       <header className={`top-0 left-0 right-0 z-50 w-full border-white/5 transition-all duration-300 ${
+         (!isOverlappingVideo || !isHomePage) ? "backdrop-blur-xl fixed" : "absolute"
        }`}>
 
         <div className="max-w-350 mx-auto px-4 md:px-6 h-20 flex justify-between items-center relative z-50">
@@ -97,7 +97,8 @@ export default function Navbar() {
               <Link
                 key={link.id}
                 href={link.href}
-                className={` ${(!isOverlappingVideo || !isHomePage) ? "nav-btn btn-liquid" : ""} px-6 py-2 w-[120px] text-center text-xs font-bold uppercase tracking-widest text-[#0F2238] hover:text-white hover:active ${
+                className={` ${(!isOverlappingVideo || !isHomePage) ? "nav-btn btn-liquid" : ""} px-6 py-2 w-[120px] text-center text-xs font-bold uppercase tracking-widest
+                   text-[#36363694] drop-shadow-lg hover:text-[#111111cf] hover:active ${
                   isActive(link.href) ? "active" : ""
                 }`}
                 onMouseEnter={

@@ -102,7 +102,8 @@ const ScrollVideo = ({ videoSrc }: { videoSrc: string }) => {
           muted
           playsInline
           preload="auto"
-          className="hidden"
+        //   className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+        className="opacity-1"
         />
       </div>
     </div>
