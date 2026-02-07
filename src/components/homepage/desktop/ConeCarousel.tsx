@@ -22,7 +22,7 @@ export default function ConeCarousel() {
       {/* 1. SCROLL CONTAINER 
         height: 500vh ensures a long scroll so the animation plays smoothly.
       */}
-      <div ref={containerRef} className="relative h-[500vh]">
+      <div ref={containerRef} className="relative h-1000vh]">
         
         {/* 2. STICKY VIEWPORT
           This stays fixed on screen while we scroll through the 500vh container.

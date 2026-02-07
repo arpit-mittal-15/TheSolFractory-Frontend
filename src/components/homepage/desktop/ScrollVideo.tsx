@@ -1,116 +1,3 @@
-// "use client";
-
-// import React, { useRef, useEffect, useState } from "react";
-// import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-
-// const ScrollVideo = ({ videoSrc }: { videoSrc: string }) => {
-//   const containerRef = useRef<HTMLDivElement>(null);
-//   const videoRef = useRef<HTMLVideoElement>(null);
-//   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-//   const scrollProgressRef = useRef(0);
-//   const rafRef = useRef<number | null>(null);
-
-//   const [showOverlay, setShowOverlay] = useState(false);
-//   const overlayLockedRef = useRef(false); // 🔒 once shown, never hide
-
-//   useEffect(() => {
-//     const video = videoRef.current;
-//     const canvas = canvasRef.current;
-//     const container = containerRef.current;
-//     if (!video || !canvas || !container) return;
-
-//     const ctx = canvas.getContext("2d")!;
-//     let currentTime = 0;
-
-//     const resize = () => {
-//       canvas.width = video.videoWidth || 1280;
-//       canvas.height = video.videoHeight || 720;
-//     };
-
-//     const onScroll = () => {
-//       const rect = container.getBoundingClientRect();
-//       const total = rect.height - window.innerHeight;
-//       const progress = Math.min(Math.max(-rect.top / total, 0), 1);
-//       scrollProgressRef.current = progress;
-//     };
-
-//     const render = () => {
-//       if (video.duration) {
-//         const target = video.duration * scrollProgressRef.current;
-//         currentTime += (target - currentTime) * 0.12;
-
-//         if (Math.abs(video.currentTime - currentTime) > 0.02) {
-//           video.currentTime = currentTime;
-//         }
-
-//         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-//         // 🎯 SHOW OVERLAY WHEN VIDEO ENDS
-//         if (
-//           !overlayLockedRef.current &&
-//         //   currentTime >= video.duration - 0.05
-//         currentTime >= video.duration * 0.05   // 8% into video
-
-//         ) {
-//           overlayLockedRef.current = true;
-//           setShowOverlay(true);
-//         }
-//       }
-
-//       rafRef.current = requestAnimationFrame(render);
-//     };
-
-//     video.addEventListener("loadedmetadata", () => {
-//       resize();
-//       render();
-//     });
-
-//     window.addEventListener("resize", resize);
-//     window.addEventListener("scroll", onScroll, { passive: true });
-
-//     return () => {
-//       window.removeEventListener("scroll", onScroll);
-//       window.removeEventListener("resize", resize);
-//       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-//     };
-//   }, []);
-
-//   return (
-//     <div ref={containerRef} className="relative h-[300vh] bg-black">
-//       <div className="sticky top-0 h-screen w-full overflow-hidden">
-//         {/* 🎬 Canvas */}
-//         <canvas
-//           ref={canvasRef}
-//           className="absolute inset-0 w-full h-full object-cover z-0"
-//         />
-
-//         {/* ✨ Overlay shown ONLY at video end */}
-//         {showOverlay && (
-//           <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-//             <TextGenerateEffect
-//               words="Exceptional quality. Endless customization. True scalability."
-//               className="max-w-4xl text-center text-4xl md:text-5xl leading-snug"
-//             />
-//           </div>
-//         )}
-
-//         {/* Hidden video for decoding */}
-//         <video
-//           ref={videoRef}
-//           src={videoSrc}
-//           muted
-//           playsInline
-//           preload="auto"
-//         //   className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-//         className="opacity-1"
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ScrollVideo;
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -294,24 +181,36 @@ export default ScrollVideo;
 // "use client";
 
 // import React, { useRef, useEffect, useState } from 'react';
+// import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 // const ScrollVideo = ({ videoSrc }: { videoSrc: string }) => {
 //   const containerRef = useRef<HTMLDivElement>(null);
 //   const videoRef = useRef<HTMLVideoElement>(null);
+//   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+//   const scrollProgressRef = useRef(0);
+//   const rafRef = useRef<number | null>(null);
+//   const overlayLockedRef = useRef(false);
+
+//   // State
 //   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 //   const [isLoading, setIsLoading] = useState(true);
+//   const [showOverlay, setShowOverlay] = useState(false);
 
-//   // 1. Pre-fetch the video entirely so it lives in memory (RAM)
-//   // This eliminates network lag during scroll scrubbing.
+//   // 1. Load Video into Blob (Memory)
 //   useEffect(() => {
+//     let active = true;
 //     const fetchVideo = async () => {
 //       try {
 //         setIsLoading(true);
 //         const response = await fetch(videoSrc);
 //         const blob = await response.blob();
 //         const objectUrl = URL.createObjectURL(blob);
-//         setVideoUrl(objectUrl);
-//         setIsLoading(false);
+        
+//         if (active) {
+//           setVideoUrl(objectUrl);
+//           setIsLoading(false);
+//         }
 //       } catch (error) {
 //         console.error("Failed to load video", error);
 //         setIsLoading(false);
@@ -320,70 +219,159 @@ export default ScrollVideo;
 
 //     fetchVideo();
 
-//     // Cleanup memory when component unmounts
 //     return () => {
+//       active = false;
 //       if (videoUrl) URL.revokeObjectURL(videoUrl);
 //     };
 //   }, [videoSrc]);
 
-//   // 2. The Scroll Logic (Same as before, but safer)
+//   // 2. Canvas & Scroll Animation Loop
 //   useEffect(() => {
 //     const video = videoRef.current;
+//     const canvas = canvasRef.current;
 //     const container = containerRef.current;
-//     if (!video || !container || !videoUrl) return;
 
-//     // Wait for metadata to ensure duration is known
-//     const onLoadedMetadata = () => {
-//         // Optional: Force a render at frame 0
-//         video.currentTime = 0; 
+//     if (!video || !canvas || !container || !videoUrl) return;
+
+//     const ctx = canvas.getContext("2d", { alpha: false });
+//     if (!ctx) return;
+
+//     let currentSmoothTime = 0;
+
+//     const resize = () => {
+//         // We set the canvas to the WINDOW size because it is fixed to the viewport
+//         canvas.width = window.innerWidth;
+//         canvas.height = window.innerHeight;
+        
+//         // Redraw immediately on resize
+//         if (video.readyState >= 2) {
+//              const scale = Math.max(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+//              const x = (canvas.width / 2) - (video.videoWidth / 2) * scale;
+//              const y = (canvas.height / 2) - (video.videoHeight / 2) * scale;
+//              ctx.drawImage(video, x, y, video.videoWidth * scale, video.videoHeight * scale);
+//         }
 //     };
-//     video.addEventListener('loadedmetadata', onLoadedMetadata);
 
-//     const handleScroll = () => {
-//       // Safety check: ensure video is ready
-//       if (!video.duration || isNaN(video.duration)) return;
-
+//     const onScroll = () => {
 //       const rect = container.getBoundingClientRect();
 //       const windowHeight = window.innerHeight;
-//       const totalHeight = rect.height + windowHeight;
-//       const progress = 1 - (rect.bottom / totalHeight);
       
-//       const clampedProgress = Math.min(Math.max(progress, 0), 1);
-
-//       requestAnimationFrame(() => {
-//         // Fast seeking is now safe because the file is in memory
-//         video.currentTime = video.duration * clampedProgress;
-//       });
+//       const totalDist = rect.height - windowHeight;
+//       const rawProgress = -rect.top / totalDist;
+      
+//       const progress = Math.min(Math.max(rawProgress, 0), 1);
+//       scrollProgressRef.current = progress;
 //     };
 
-//     window.addEventListener('scroll', handleScroll);
+//     const render = () => {
+//       if (video.duration) {
+//         const targetTime = video.duration * scrollProgressRef.current;
+//         currentSmoothTime += (targetTime - currentSmoothTime) * 0.12;
+
+//         if (Math.abs(video.currentTime - currentSmoothTime) > 0.01) {
+//           video.currentTime = currentSmoothTime;
+//         }
+
+//         // DRAW LOGIC: "Cover" fit for Canvas
+//         const scale = Math.max(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+//         const x = (canvas.width / 2) - (video.videoWidth / 2) * scale;
+//         const y = (canvas.height / 2) - (video.videoHeight / 2) * scale;
+        
+//         ctx.drawImage(video, x, y, video.videoWidth * scale, video.videoHeight * scale);
+
+//         // Overlay Logic
+//         if (!overlayLockedRef.current && currentSmoothTime >= video.duration * 0.4) {
+//           overlayLockedRef.current = true;
+//           setShowOverlay(true);
+//         }
+//       }
+
+//       rafRef.current = requestAnimationFrame(render);
+//     };
+
+//     const handleMetadata = () => {
+//       resize();
+//       render(); 
+//     };
+
+//     video.addEventListener("loadedmetadata", handleMetadata);
+//     window.addEventListener("resize", resize);
+//     window.addEventListener("scroll", onScroll, { passive: true });
+
+//     // Initial Trigger
+//     resize();
+//     render();
+
 //     return () => {
-//         window.removeEventListener('scroll', handleScroll);
-//         video.removeEventListener('loadedmetadata', onLoadedMetadata);
+//       window.removeEventListener("scroll", onScroll);
+//       window.removeEventListener("resize", resize);
+//       video.removeEventListener("loadedmetadata", handleMetadata);
+//       if (rafRef.current) cancelAnimationFrame(rafRef.current);
 //     };
-//   }, [videoUrl]); // Re-run this effect when videoUrl is ready
+//   }, [videoUrl]);
 
 //   return (
-//     <div 
-//       ref={containerRef} 
-//       className="relative w-full h-[300vh] bg-black" 
-//     >
-//       <div className="sticky top-0 h-screen w-full overflow-hidden">
+//     <div ref={containerRef} className="relative h-[270vh] bg-[rgb(0,20,52)] pt-15">
+      
+//       {/* THE STICKY FRAME 
+//          This element scrolls normally until it sticks.
+//          We rely on 'clip-path' inside it to reveal the fixed video.
+//       */}
+//       <div className="sticky top-10 m-auto h-[90vh] w-[95vw] relative z-10">
+        
+//         {/* Shadow & Border Layer (Separate div so clip-path doesn't cut the shadow) */}
+//         <div className="absolute inset-0 rounded-2xl shadow-[0_5px_35px_rgba(255,255,255,0.25)] border border-white/60 pointer-events-none z-20" />
+
+//         {/* THE MASK 
+//            This creates the "Window". The content inside is FIXED to the screen,
+//            but this div hides anything outside the rounded corners.
+//         */}
+//         <div 
+//             className="absolute inset-0 rounded-2xl overflow-hidden z-0 bg-black/10" 
+//             style={{ clipPath: "inset(0 round 1rem)" }} // Ensures strict clipping of fixed children
+//         >
+//             {/* THE CANVAS (Fixed Video)
+//                Position: Fixed -> Pins it to the viewport (Screen)
+//                Width/Height: Screen -> Fills the viewport
+//                Result: It looks like a fixed background image.
+//             */}
+//             <canvas
+//                 ref={canvasRef}
+//                 className="fixed top-0 left-0 w-screen h-screen object-cover -z-10"
+//             />
+            
+//             {/* Hidden Source Video */}
+//             {videoUrl && (
+//                 <video
+//                 ref={videoRef}
+//                 src={videoUrl}
+//                 muted
+//                 playsInline
+//                 preload="auto"
+//                 className="hidden" // We only need the data, not the element
+//                 />
+//             )}
+//         </div>
+
+//         {/* CONTENT (Text/Overlays) - Sits inside the sticky frame */}
+        
+//         {/* Loading Spinner */}
 //         {isLoading && (
-//             <div className="absolute inset-0 flex items-center justify-center text-white bg-black z-10">
-//                 Loading...
+//             <div className="absolute inset-0 flex items-center justify-center text-white z-50 font-bold tracking-wider">
+//                 LOADING VIDEO...
 //             </div>
 //         )}
-        
-//         {videoUrl && (
-//             <video
-//               ref={videoRef}
-//               src={videoUrl}
-//               className="w-full h-full object-cover"
-//               muted
-//               playsInline
-//               // removing preload="auto" because we manually fetched it
-//             />
+
+//         {/* Text Overlay */}
+//         {showOverlay && (
+//           <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none mix-blend-overlay">
+//             <div className="">
+//                 <TextGenerateEffect
+//                 words="Exceptional Quality. Endless Customization. True Scalability."
+//                 className="text-center text-4xl md:text-6xl text-white font-bold drop-shadow-lg"
+//                 />
+//             </div>
+//           </div>
 //         )}
 //       </div>
 //     </div>
