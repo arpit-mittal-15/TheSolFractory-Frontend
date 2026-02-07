@@ -28,7 +28,7 @@ export default function ConeCarousel() {
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center">
 
           {/* The 3D Scene */}
-          <div className="w-full h-full">
+          <div className="w-full h-full mt-16">
             <CarouselCanvas scrollProgress={scrollYProgress} />
           </div>
           

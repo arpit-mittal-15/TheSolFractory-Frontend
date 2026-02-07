@@ -27,17 +27,14 @@ function ShinyGlassCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [shine, setShine] = useState({ x: 50, y: 50 });
 
-  const onMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!cardRef.current) return;
-      const r = cardRef.current.getBoundingClientRect();
-      setShine({
-        x: ((e.clientX - r.left) / r.width) * 100,
-        y: ((e.clientY - r.top) / r.height) * 100,
-      });
-    },
-    []
-  );
+  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const r = cardRef.current.getBoundingClientRect();
+    setShine({
+      x: ((e.clientX - r.left) / r.width) * 100,
+      y: ((e.clientY - r.top) / r.height) * 100,
+    });
+  }, []);
 
   return (
     <div
@@ -89,7 +86,7 @@ export default function MachinerySection() {
 
       {/* ================= CENTER GLASS HERO (VIDEO INSIDE CARD) ================= */}
       <div
-        className="relative z-10 w-full max-w-[1220px] mx-auto rounded-3xl overflow-hidden px-8 py-24 min-h-[420px]"
+        className="relative z-10 w-[1220px] mx-auto rounded-3xl overflow-hidden px-8 py-24 min-h-[420px] max-h-[480px]"
         style={{
           background:
             "linear-gradient(160deg, rgba(255,255,255,0.35), rgba(19,33,53,0.45))",
@@ -105,8 +102,8 @@ export default function MachinerySection() {
       >
         {/* 🎥 VIDEO BACKGROUND INSIDE CARD */}
         <video
-          // src="/videos/alienrobo1.mp4"
-          src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/alienrobo1.mp4"
+          // src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/alienrobo1.mp4"
+          src="https://ja3zeotcy2kd52jg.public.blob.vercel-storage.com/alienrobo1_compressed.mp4"
           autoPlay
           muted
           loop
@@ -115,32 +112,47 @@ export default function MachinerySection() {
         />
 
         {/* bg-blue-800/40 backdrop-grayscale-80  // bg-[#081427]/70 */}
-        <div className="absolute inset-0 bg-blue-950/50 backdrop-blur-[2px]" /> 
-          {/* glass highlight */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(120deg, rgba(255,255,255,0.35), transparent 45%)",
-            }}
-          />
+        <div className="absolute inset-0 bg-blue-950/50 backdrop-blur-[2px]" />
+        {/* glass highlight */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(120deg, rgba(255,255,255,0.35), transparent 45%)",
+          }}
+        />
 
         {/* ================= CENTER CONTENT ================= */}
-      <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+        <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto -translate-y-6 md:-translate-y-10">
+          <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight">
             Cone Automation
           </h1>
 
-          <p className="mt-6 max-w-xl text-white/90 leading-relaxed">
-            Automate your pre-roll production with high-speed fill and seal technology.
+          <p
+            className="
+    mt-6
+    max-w-4xl
+    text-base
+    md:text-lg
+    lg:text-2xl
+    font-medium
+    text-white/95
+    whitespace-nowrap
+  "
+            style={{
+              textShadow: "0 4px 18px rgba(0,0,0,0.45)",
+            }}
+          >
+            Automate your pre-roll production with high-speed fill and seal
+            technology.
           </p>
 
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="mt-18 grid grid-cols-1 sm:grid-cols-3 gap-22">
             {FEATURES.map((f) => (
               <ShinyGlassCard key={f.label} {...f} />
             ))}
           </div>
-      </div>
+        </div>
       </div>
     </section>
   );
